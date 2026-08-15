@@ -11,6 +11,10 @@ interface ResultCardProps {
       ciudad: string;
       estado: string;
       observaciones: string | null;
+      nodo: string | null;
+      tipo_red: string | null;
+      direccion: string | null;
+      cedula_asesor: string | null;
       created_at: string;
     } | null;
   };

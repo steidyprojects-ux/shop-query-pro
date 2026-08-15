@@ -43,6 +43,10 @@ interface MobilityRecord {
   ciudad: string;
   estado: string;
   observaciones: string | null;
+  nodo: string | null;
+  tipo_red: string | null;
+  direccion: string | null;
+  cedula_asesor: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -77,10 +81,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
     ciudad: "",
     estado: "aprobada",
     observaciones: "",
+    nodo: "",
+    tipo_red: "",
+    direccion: "",
+    cedula_asesor: "",
   });
 
   const resetForm = () => {
-    setForm({ cedula: "", ciudad: "", estado: "aprobada", observaciones: "" });
+    setForm({ cedula: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
     setEditing(null);
   };
 
@@ -97,6 +105,10 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
             ciudad: form.ciudad,
             estado: form.estado as "aprobada" | "rechazada" | "con_deuda",
             observaciones: form.observaciones,
+            nodo: form.nodo,
+            tipo_red: form.tipo_red,
+            direccion: form.direccion,
+            cedula_asesor: form.cedula_asesor,
           },
         });
       } else {
@@ -106,6 +118,10 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
             ciudad: form.ciudad,
             estado: form.estado as "aprobada" | "rechazada" | "con_deuda",
             observaciones: form.observaciones,
+            nodo: form.nodo,
+            tipo_red: form.tipo_red,
+            direccion: form.direccion,
+            cedula_asesor: form.cedula_asesor,
           },
         });
       }
@@ -135,6 +151,10 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
       ciudad: record.ciudad,
       estado: record.estado,
       observaciones: record.observaciones ?? "",
+      nodo: record.nodo ?? "",
+      tipo_red: record.tipo_red ?? "",
+      direccion: record.direccion ?? "",
+      cedula_asesor: record.cedula_asesor ?? "",
     });
   };
 
@@ -197,6 +217,40 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                 </SelectContent>
               </Select>
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="nodo">Nodo</Label>
+                <Input
+                  id="nodo"
+                  value={form.nodo}
+                  onChange={(e) => setForm({ ...form, nodo: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tipo_red">Tipo de red</Label>
+                <Input
+                  id="tipo_red"
+                  value={form.tipo_red}
+                  onChange={(e) => setForm({ ...form, tipo_red: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="direccion">Dirección</Label>
+                <Input
+                  id="direccion"
+                  value={form.direccion}
+                  onChange={(e) => setForm({ ...form, direccion: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cedula_asesor">Cédula asesor de digitación</Label>
+                <Input
+                  id="cedula_asesor"
+                  value={form.cedula_asesor}
+                  onChange={(e) => setForm({ ...form, cedula_asesor: e.target.value })}
+                />
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="observaciones">Observaciones</Label>
               <Textarea
@@ -227,6 +281,10 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               <TableHead>Cédula</TableHead>
               <TableHead>Ciudad</TableHead>
               <TableHead>Estado</TableHead>
+              <TableHead className="hidden lg:table-cell">Nodo</TableHead>
+              <TableHead className="hidden lg:table-cell">Tipo de red</TableHead>
+              <TableHead className="hidden xl:table-cell">Dirección</TableHead>
+              <TableHead className="hidden xl:table-cell">Cédula asesor</TableHead>
               <TableHead className="hidden md:table-cell">Observaciones</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -234,14 +292,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-8 text-center">
+                <TableCell colSpan={9} className="py-8 text-center">
                   <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
                 </TableCell>
               </TableRow>
             ) : records.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={9}
                   className="py-8 text-center text-muted-foreground"
                 >
                   No hay registros aún.
@@ -258,6 +316,10 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                         record.estado}
                     </Badge>
                   </TableCell>
+                  <TableCell className="hidden lg:table-cell">{record.nodo ?? "—"}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{record.tipo_red ?? "—"}</TableCell>
+                  <TableCell className="hidden max-w-xs truncate xl:table-cell">{record.direccion ?? "—"}</TableCell>
+                  <TableCell className="hidden xl:table-cell">{record.cedula_asesor ?? "—"}</TableCell>
                   <TableCell className="hidden max-w-xs truncate md:table-cell">
                     {record.observaciones ?? "—"}
                   </TableCell>
