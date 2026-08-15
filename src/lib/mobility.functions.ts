@@ -12,6 +12,10 @@ const recordSchema = z.object({
   ciudad: z.string().min(2).max(50).trim(),
   estado: z.enum(["aprobada", "rechazada", "con_deuda"]),
   observaciones: z.string().max(500).optional(),
+  nodo: z.string().max(100).optional(),
+  tipo_red: z.string().max(100).optional(),
+  direccion: z.string().max(200).optional(),
+  cedula_asesor: z.string().max(20).optional(),
 });
 
 const idSchema = z.object({
@@ -26,7 +30,7 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
 
     const { data: records, error } = await supabase
       .from("mobility_records")
-      .select("id, cedula, ciudad, estado, observaciones, created_at")
+      .select("id, cedula, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at")
       .eq("cedula", data.cedula)
       .ilike("ciudad", data.ciudad)
       .order("created_at", { ascending: false })
@@ -59,7 +63,7 @@ export const listarRegistros = createServerFn({ method: "GET" })
 
     const { data: records, error } = await supabase
       .from("mobility_records")
-      .select("id, cedula, ciudad, estado, observaciones, created_at, updated_at")
+      .select("id, cedula, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at")
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -92,9 +96,13 @@ export const crearRegistro = createServerFn({ method: "POST" })
         ciudad: data.ciudad,
         estado: data.estado,
         observaciones: data.observaciones ?? null,
+        nodo: data.nodo ?? null,
+        tipo_red: data.tipo_red ?? null,
+        direccion: data.direccion ?? null,
+        cedula_asesor: data.cedula_asesor ?? null,
         created_by: userId,
       })
-      .select("id, cedula, ciudad, estado, observaciones, created_at")
+      .select("id, cedula, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at")
       .single();
 
     if (error) {
@@ -122,12 +130,16 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
       throw new Error("No tienes permisos para actualizar registros.");
     }
 
-    const { id, cedula, ciudad, estado, observaciones } = data;
+    const { id, cedula, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor } = data;
     const updates: Partial<{
       cedula: string;
       ciudad: string;
       estado: "aprobada" | "rechazada" | "con_deuda";
       observaciones: string | null;
+      nodo: string | null;
+      tipo_red: string | null;
+      direccion: string | null;
+      cedula_asesor: string | null;
     }> = {};
 
     if (cedula !== undefined) updates.cedula = cedula;
@@ -136,12 +148,16 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
     if (observaciones !== undefined) {
       updates.observaciones = observaciones || null;
     }
+    if (nodo !== undefined) updates.nodo = nodo || null;
+    if (tipo_red !== undefined) updates.tipo_red = tipo_red || null;
+    if (direccion !== undefined) updates.direccion = direccion || null;
+    if (cedula_asesor !== undefined) updates.cedula_asesor = cedula_asesor || null;
 
     const { data: record, error } = await supabase
       .from("mobility_records")
       .update(updates)
       .eq("id", id)
-      .select("id, cedula, ciudad, estado, observaciones, created_at, updated_at")
+      .select("id, cedula, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at")
       .single();
 
     if (error) {
