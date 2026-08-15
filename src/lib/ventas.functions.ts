@@ -73,13 +73,29 @@ export const actualizarVenta = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { id, ...rest } = data;
 
-    const updates: Record<string, string | null> = {};
-    for (const [key, value] of Object.entries(rest)) {
-      if (value !== undefined) updates[key] = (value as string) || null;
-    }
+    const updates: {
+      nombre_cliente?: string;
+      cedula_cliente?: string;
+      telefono?: string | null;
+      cuenta?: string | null;
+      orden_trabajo?: string | null;
+      cedula_vendedor?: string;
+      ciudad?: string | null;
+      observaciones?: string | null;
+    } = {};
+
+    if (rest.nombre_cliente !== undefined) updates.nombre_cliente = rest.nombre_cliente;
+    if (rest.cedula_cliente !== undefined) updates.cedula_cliente = rest.cedula_cliente;
+    if (rest.cedula_vendedor !== undefined) updates.cedula_vendedor = rest.cedula_vendedor;
+    if (rest.telefono !== undefined) updates.telefono = rest.telefono || null;
+    if (rest.cuenta !== undefined) updates.cuenta = rest.cuenta || null;
+    if (rest.orden_trabajo !== undefined) updates.orden_trabajo = rest.orden_trabajo || null;
+    if (rest.ciudad !== undefined) updates.ciudad = rest.ciudad || null;
+    if (rest.observaciones !== undefined) updates.observaciones = rest.observaciones || null;
 
     const { data: venta, error } = await supabase
       .from("ventas_siap")
+
       .update(updates)
       .eq("id", id)
       .select(SELECT_COLS)
