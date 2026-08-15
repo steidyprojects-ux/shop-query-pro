@@ -37,7 +37,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 
-interface Record {
+interface MobilityRecord {
   id: string;
   cedula: string;
   ciudad: string;
@@ -48,7 +48,7 @@ interface Record {
 }
 
 interface MobilityRecordsTableProps {
-  records: Record[];
+  records: MobilityRecord[];
   isLoading: boolean;
 }
 
