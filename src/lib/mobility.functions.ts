@@ -122,7 +122,11 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
       throw new Error("No tienes permisos para actualizar registros.");
     }
 
-    const { id, ...updates } = data;
+    const { id, ...rawUpdates } = data;
+
+    const updates = Object.fromEntries(
+      Object.entries(rawUpdates).filter(([, v]) => v !== undefined)
+    );
 
     const { data: record, error } = await supabase
       .from("mobility_records")
