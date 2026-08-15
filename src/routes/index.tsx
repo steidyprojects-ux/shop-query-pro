@@ -1,24 +1,95 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Search, ShieldCheck, Smartphone, Zap } from "lucide-react";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Visor Movilidad — Consulta de estado" },
+      { name: "description", content: "Consulta el estado de movilidad de Claro por cédula y ciudad. Rápido, seguro y fácil." },
+      { property: "og:title", content: "Visor Movilidad — Consulta de estado" },
+      { property: "og:description", content: "Consulta el estado de movilidad de Claro por cédula y ciudad." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: HomePage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function HomePage() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="flex flex-col">
+      <section className="relative overflow-hidden px-4 py-20 sm:py-28">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-background to-background" />
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+            <Zap className="h-4 w-4" />
+            Consulta rápida y segura
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl">
+            Visor de Movilidad
+          </h1>
+          <p className="mt-6 text-lg text-muted-foreground sm:text-xl">
+            Consulta el estado de movilidad de tus clientes por cédula y ciudad.
+            Obtén resultados claros: aprobada, rechazada o con deuda.
+          </p>
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button asChild size="lg" className="gap-2 text-base">
+              <Link to="/login">
+                <Search className="h-5 w-5" />
+                Iniciar consulta
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="text-base">
+              <Link to="/login">Crear cuenta</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-16">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="text-center text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Todo lo que necesitas para consultar
+          </h2>
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+            <Card className="border-border/60">
+              <CardContent className="pt-6">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Smartphone className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold">Consulta por cédula</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Ingresa el número de cédula del cliente y la ciudad para verificar su estado.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-border/60">
+              <CardContent className="pt-6">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold">Resultados claros</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Visualiza si el cliente está aprobado, rechazado o cuenta con deudas pendientes.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-border/60">
+              <CardContent className="pt-6">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Search className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-semibold">Panel administrador</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Los administradores pueden crear, editar y eliminar registros de forma sencilla.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
