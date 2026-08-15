@@ -41,6 +41,13 @@ export function Header() {
                 Nodos
               </Link>
               <Link
+                to="/tarifas"
+                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+              >
+                Tarifas
+              </Link>
+
+              <Link
                 to="/admin"
                 className="hidden items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
               >
