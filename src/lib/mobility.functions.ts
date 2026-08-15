@@ -122,11 +122,20 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
       throw new Error("No tienes permisos para actualizar registros.");
     }
 
-    const { id, ...rawUpdates } = data;
+    const { id, cedula, ciudad, estado, observaciones } = data;
+    const updates: Partial<{
+      cedula: string;
+      ciudad: string;
+      estado: "aprobada" | "rechazada" | "con_deuda";
+      observaciones: string | null;
+    }> = {};
 
-    const updates = Object.fromEntries(
-      Object.entries(rawUpdates).filter(([, v]) => v !== undefined)
-    );
+    if (cedula !== undefined) updates.cedula = cedula;
+    if (ciudad !== undefined) updates.ciudad = ciudad;
+    if (estado !== undefined) updates.estado = estado;
+    if (observaciones !== undefined) {
+      updates.observaciones = observaciones || null;
+    }
 
     const { data: record, error } = await supabase
       .from("mobility_records")
