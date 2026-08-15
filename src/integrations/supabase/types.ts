@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      codigos_asesor: {
+        Row: {
+          cc_completa: string | null
+          codigo: string
+          gv_division: string | null
+          id: number
+          nombre: string | null
+          regional: string
+          tipo: string
+        }
+        Insert: {
+          cc_completa?: string | null
+          codigo: string
+          gv_division?: string | null
+          id?: number
+          nombre?: string | null
+          regional: string
+          tipo: string
+        }
+        Update: {
+          cc_completa?: string | null
+          codigo?: string
+          gv_division?: string | null
+          id?: number
+          nombre?: string | null
+          regional?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
+      distritos_calle: {
+        Row: {
+          distrito: string
+          id: number
+          region: string | null
+          regional: string | null
+          zona: string | null
+        }
+        Insert: {
+          distrito: string
+          id?: number
+          region?: string | null
+          regional?: string | null
+          zona?: string | null
+        }
+        Update: {
+          distrito?: string
+          id?: number
+          region?: string | null
+          regional?: string | null
+          zona?: string | null
+        }
+        Relationships: []
+      }
       mobility_records: {
         Row: {
           cedula: string
@@ -56,6 +110,54 @@ export type Database = {
           observaciones?: string | null
           tipo_red?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      nodos: {
+        Row: {
+          area: string | null
+          comunidad: string | null
+          departamento: string | null
+          distrito: string | null
+          estado_nodo: string | null
+          id: number
+          id_nodo: string
+          nombre_comunidad: string | null
+          nombre_nodo: string | null
+          red_por_nodo: string | null
+          red_predominante: string | null
+          region: string | null
+          regional: string | null
+        }
+        Insert: {
+          area?: string | null
+          comunidad?: string | null
+          departamento?: string | null
+          distrito?: string | null
+          estado_nodo?: string | null
+          id?: number
+          id_nodo: string
+          nombre_comunidad?: string | null
+          nombre_nodo?: string | null
+          red_por_nodo?: string | null
+          red_predominante?: string | null
+          region?: string | null
+          regional?: string | null
+        }
+        Update: {
+          area?: string | null
+          comunidad?: string | null
+          departamento?: string | null
+          distrito?: string | null
+          estado_nodo?: string | null
+          id?: number
+          id_nodo?: string
+          nombre_comunidad?: string | null
+          nombre_nodo?: string | null
+          red_por_nodo?: string | null
+          red_predominante?: string | null
+          region?: string | null
+          regional?: string | null
         }
         Relationships: []
       }
