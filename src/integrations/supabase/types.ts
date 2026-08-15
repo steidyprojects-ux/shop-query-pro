@@ -17,32 +17,44 @@ export type Database = {
       mobility_records: {
         Row: {
           cedula: string
+          cedula_asesor: string | null
           ciudad: string
           created_at: string
           created_by: string | null
+          direccion: string | null
           estado: string
           id: string
+          nodo: string | null
           observaciones: string | null
+          tipo_red: string | null
           updated_at: string
         }
         Insert: {
           cedula: string
+          cedula_asesor?: string | null
           ciudad: string
           created_at?: string
           created_by?: string | null
+          direccion?: string | null
           estado: string
           id?: string
+          nodo?: string | null
           observaciones?: string | null
+          tipo_red?: string | null
           updated_at?: string
         }
         Update: {
           cedula?: string
+          cedula_asesor?: string | null
           ciudad?: string
           created_at?: string
           created_by?: string | null
+          direccion?: string | null
           estado?: string
           id?: string
+          nodo?: string | null
           observaciones?: string | null
+          tipo_red?: string | null
           updated_at?: string
         }
         Relationships: []
