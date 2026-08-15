@@ -182,6 +182,60 @@ export type Database = {
         }
         Relationships: []
       }
+      tarifas: {
+        Row: {
+          accesos: string | null
+          campana: string | null
+          categoria: string
+          codigo_ftth: string | null
+          codigo_hfc: string | null
+          created_at: string
+          decodificadores: string | null
+          id: string
+          instalacion: string | null
+          orden: number
+          ott: string | null
+          renta: number
+          servicio: string
+          updated_at: string
+          vigencia: string | null
+        }
+        Insert: {
+          accesos?: string | null
+          campana?: string | null
+          categoria: string
+          codigo_ftth?: string | null
+          codigo_hfc?: string | null
+          created_at?: string
+          decodificadores?: string | null
+          id?: string
+          instalacion?: string | null
+          orden?: number
+          ott?: string | null
+          renta: number
+          servicio: string
+          updated_at?: string
+          vigencia?: string | null
+        }
+        Update: {
+          accesos?: string | null
+          campana?: string | null
+          categoria?: string
+          codigo_ftth?: string | null
+          codigo_hfc?: string | null
+          created_at?: string
+          decodificadores?: string | null
+          id?: string
+          instalacion?: string | null
+          orden?: number
+          ott?: string | null
+          renta?: number
+          servicio?: string
+          updated_at?: string
+          vigencia?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
