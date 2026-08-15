@@ -35,9 +35,16 @@ export function Header() {
                 Consultar
               </Link>
               <Link
+                to="/nodos"
+                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+              >
+                Nodos
+              </Link>
+              <Link
                 to="/admin"
                 className="hidden items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
               >
+
                 <Shield className="h-3.5 w-3.5" />
                 Admin
               </Link>

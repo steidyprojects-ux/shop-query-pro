@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedConsultaRouteImport } from './routes/_authenticated/consulta'
+import { Route as AuthenticatedNodosRouteImport } from './routes/_authenticated/nodos'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 
 const IndexRoute = IndexRouteImport.update({
@@ -40,6 +41,11 @@ const AuthenticatedConsultaRoute = AuthenticatedConsultaRouteImport.update({
   path: '/consulta',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNodosRoute = AuthenticatedNodosRouteImport.update({
+  id: '/nodos',
+  path: '/nodos',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/consulta': typeof AuthenticatedConsultaRoute
+  '/nodos': typeof AuthenticatedNodosRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/consulta': typeof AuthenticatedConsultaRoute
+  '/nodos': typeof AuthenticatedNodosRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,15 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/consulta': typeof AuthenticatedConsultaRoute
+  '/_authenticated/nodos': typeof AuthenticatedNodosRoute
   '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/admin' | '/consulta' | '/auth/callback'
+  fullPaths:
+    '/' | '/login' | '/admin' | '/consulta' | '/nodos' | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/admin' | '/consulta' | '/auth/callback'
+  to: '/' | '/login' | '/admin' | '/consulta' | '/nodos' | '/auth/callback'
   id:
     | '__root__'
     | '/'
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/admin'
     | '/_authenticated/consulta'
+    | '/_authenticated/nodos'
     | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
@@ -128,6 +139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsultaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/nodos': {
+      id: '/_authenticated/nodos'
+      path: '/nodos'
+      fullPath: '/nodos'
+      preLoaderRoute: typeof AuthenticatedNodosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -141,11 +159,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedConsultaRoute: typeof AuthenticatedConsultaRoute
+  AuthenticatedNodosRoute: typeof AuthenticatedNodosRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedConsultaRoute: AuthenticatedConsultaRoute,
+  AuthenticatedNodosRoute: AuthenticatedNodosRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
