@@ -254,6 +254,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ventas_siap: {
+        Row: {
+          cedula_cliente: string
+          cedula_vendedor: string
+          ciudad: string | null
+          created_at: string
+          created_by: string
+          cuenta: string | null
+          id: string
+          nombre_cliente: string
+          observaciones: string | null
+          orden_trabajo: string | null
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          cedula_cliente: string
+          cedula_vendedor: string
+          ciudad?: string | null
+          created_at?: string
+          created_by: string
+          cuenta?: string | null
+          id?: string
+          nombre_cliente: string
+          observaciones?: string | null
+          orden_trabajo?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cedula_cliente?: string
+          cedula_vendedor?: string
+          ciudad?: string | null
+          created_at?: string
+          created_by?: string
+          cuenta?: string | null
+          id?: string
+          nombre_cliente?: string
+          observaciones?: string | null
+          orden_trabajo?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
