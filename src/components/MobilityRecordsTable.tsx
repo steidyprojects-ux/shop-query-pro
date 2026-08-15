@@ -48,7 +48,7 @@ interface MobilityRecord {
 }
 
 interface MobilityRecordsTableProps {
-  records: MobilityRecord[];
+  records: MobilityMobilityRecord[];
   isLoading: boolean;
 }
 
@@ -58,7 +58,7 @@ const estadoOptions = [
   { value: "con_deuda", label: "Con deuda" },
 ];
 
-const estadoVariant: Record<string, "default" | "destructive" | "secondary" | "outline"> = {
+const estadoVariant: MobilityRecord<string, "default" | "destructive" | "secondary" | "outline"> = {
   aprobada: "default",
   rechazada: "destructive",
   con_deuda: "secondary",
@@ -128,7 +128,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
     }
   };
 
-  const startEdit = (record: Record) => {
+  const startEdit = (record: MobilityRecord) => {
     setEditing(record);
     setForm({
       cedula: record.cedula,
