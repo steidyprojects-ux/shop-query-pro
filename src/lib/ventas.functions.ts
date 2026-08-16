@@ -130,8 +130,12 @@ export const eliminarVenta = createServerFn({ method: "POST" })
 
 // --- Salidas de datos sensibles: autorizadas y construidas en el servidor ---
 
+type SupabaseCtx = Parameters<Parameters<typeof requireSupabaseAuth.server>[0]>[0] extends never
+  ? never
+  : never;
+
 async function esAdmin(
-  supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => Promise<{ data: unknown }> },
+  supabase: { rpc: (fn: never, args: never) => unknown },
   userId: string,
 ) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
