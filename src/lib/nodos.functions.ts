@@ -17,8 +17,9 @@ const REDES_VALIDAS = ["BIDIRECCIONAL", "FTT"];
 export const consultarNodo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => consultaSchema.parse(data))
-  .handler(async ({ data, context }) => {
-    const { supabase } = context;
+  .handler(async ({ data }) => {
+    // Catálogo servido por el servidor tras verificar la sesión del asesor.
+    const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
     const codigo = data.codigo ? limpiarCodigoNodo(data.codigo) : "";
     const ciudad = data.ciudad ? normalizar(data.ciudad) : "";
 
