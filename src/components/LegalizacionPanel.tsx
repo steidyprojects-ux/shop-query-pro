@@ -40,24 +40,13 @@ const emptyForm = {
   observaciones: "",
 };
 
-function ventaTexto(v: Venta) {
-  return [
-    v.nombre_cliente.toUpperCase(),
-    v.cedula_cliente,
-    v.telefono ?? "",
-    `Cuenta: ${v.cuenta ?? ""}`,
-    `Orden de Trabajo: ${v.orden_trabajo ?? ""}`,
-    `Cédula del vendedor: ${v.cedula_vendedor}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
-
 export function LegalizacionPanel() {
   const queryClient = useQueryClient();
   const listFn = useServerFn(listarVentas);
   const createFn = useServerFn(registrarVenta);
   const deleteFn = useServerFn(eliminarVenta);
+  const copyFn = useServerFn(copiarVenta);
+  const exportFn = useServerFn(exportarVentasCsv);
 
   const [form, setForm] = useState(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,43 +88,31 @@ export function LegalizacionPanel() {
   };
 
   const copiar = async (v: Venta) => {
-    await navigator.clipboard.writeText(ventaTexto(v));
-    toast.success("Datos copiados para SIAP");
+    try {
+      const { texto } = await copyFn({ data: { id: v.id } });
+      await navigator.clipboard.writeText(texto);
+      toast.success("Datos copiados para SIAP");
+    } catch (err) {
+      console.error(err);
+      toast.error("No tienes permiso para copiar esta venta");
+    }
   };
 
-  const exportarCsv = () => {
-    const headers = [
-      "Fecha",
-      "Nombre cliente",
-      "Cédula cliente",
-      "Teléfono",
-      "Cuenta",
-      "Orden de trabajo",
-      "Cédula vendedor",
-      "Ciudad",
-      "Observaciones",
-    ];
-    const rows = ventas.map((v) => [
-      new Date(v.created_at).toLocaleDateString("es-CO"),
-      v.nombre_cliente,
-      v.cedula_cliente,
-      v.telefono ?? "",
-      v.cuenta ?? "",
-      v.orden_trabajo ?? "",
-      v.cedula_vendedor,
-      v.ciudad ?? "",
-      v.observaciones ?? "",
-    ]);
-    const csv = [headers, ...rows]
-      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";"))
-      .join("\n");
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `ventas-siap-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportarCsv = async () => {
+    try {
+      const { csv, filename, total } = await exportFn({});
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${total} ventas exportadas`);
+    } catch (err) {
+      console.error(err);
+      toast.error("No se pudo exportar (sin permiso o sin datos)");
+    }
   };
 
   return (
