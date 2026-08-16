@@ -130,25 +130,17 @@ export const eliminarVenta = createServerFn({ method: "POST" })
 
 // --- Salidas de datos sensibles: autorizadas y construidas en el servidor ---
 
-type SupabaseCtx = Parameters<Parameters<typeof requireSupabaseAuth.server>[0]>[0] extends never
-  ? never
-  : never;
-
-async function esAdmin(
-  supabase: { rpc: (fn: never, args: never) => unknown },
-  userId: string,
-) {
-  const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  return data === true;
-}
-
 /** Devuelve el texto SIAP de UNA venta, solo si es del asesor o si es admin. */
 export const copiarVenta = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => idSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const admin = await esAdmin(supabase, userId);
+    const { data: adminFlag } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    const admin = adminFlag === true;
 
     let query = supabase.from("ventas_siap").select(SELECT_COLS).eq("id", data.id);
     if (!admin) query = query.eq("created_by", userId);
@@ -179,7 +171,11 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const admin = await esAdmin(supabase, userId);
+    const { data: adminFlag } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    const admin = adminFlag === true;
 
     let query = supabase
       .from("ventas_siap")
