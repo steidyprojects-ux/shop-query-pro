@@ -127,3 +127,101 @@ export const eliminarVenta = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+// --- Salidas de datos sensibles: autorizadas y construidas en el servidor ---
+
+/** Devuelve el texto SIAP de UNA venta, solo si es del asesor o si es admin. */
+export const copiarVenta = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => idSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: adminFlag } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    const admin = adminFlag === true;
+
+    let query = supabase.from("ventas_siap").select(SELECT_COLS).eq("id", data.id);
+    if (!admin) query = query.eq("created_by", userId);
+
+    const { data: venta, error } = await query.maybeSingle();
+    if (error) {
+      console.error("Error obteniendo venta:", error);
+      throw new Error("No se pudo obtener la venta.");
+    }
+    if (!venta) throw new Error("No autorizado para copiar esta venta.");
+
+    return {
+      texto: [
+        venta.nombre_cliente.toUpperCase(),
+        venta.cedula_cliente,
+        venta.telefono ?? "",
+        `Cuenta: ${venta.cuenta ?? ""}`,
+        `Orden de Trabajo: ${venta.orden_trabajo ?? ""}`,
+        `Cédula del vendedor: ${venta.cedula_vendedor}`,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    };
+  });
+
+/** Genera el CSV en el servidor con solo las ventas que el usuario puede ver. */
+export const exportarVentasCsv = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: adminFlag } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    const admin = adminFlag === true;
+
+    let query = supabase
+      .from("ventas_siap")
+      .select(SELECT_COLS)
+      .order("created_at", { ascending: false })
+      .limit(5000);
+    if (!admin) query = query.eq("created_by", userId);
+
+    const { data: filas, error } = await query;
+    if (error) {
+      console.error("Error exportando ventas:", error);
+      throw new Error("No se pudo generar la exportación.");
+    }
+    if (!filas || filas.length === 0) {
+      throw new Error("No hay ventas para exportar.");
+    }
+
+    const headers = [
+      "Fecha",
+      "Nombre cliente",
+      "Cédula cliente",
+      "Teléfono",
+      "Cuenta",
+      "Orden de trabajo",
+      "Cédula vendedor",
+      "Ciudad",
+      "Observaciones",
+    ];
+    const rows = filas.map((v) => [
+      new Date(v.created_at).toLocaleDateString("es-CO"),
+      v.nombre_cliente,
+      v.cedula_cliente,
+      v.telefono ?? "",
+      v.cuenta ?? "",
+      v.orden_trabajo ?? "",
+      v.cedula_vendedor,
+      v.ciudad ?? "",
+      v.observaciones ?? "",
+    ]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(";"))
+      .join("\n");
+
+    return {
+      filename: `ventas-siap-${new Date().toISOString().slice(0, 10)}.csv`,
+      csv,
+      total: filas.length,
+    };
+  });
