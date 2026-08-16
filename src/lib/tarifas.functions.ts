@@ -10,8 +10,9 @@ const schema = z.object({
 export const listarTarifas = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => schema.parse(data))
-  .handler(async ({ data, context }) => {
-    let query = context.supabase
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let query = supabaseAdmin
       .from("tarifas")
       .select("*")
       .order("categoria", { ascending: true })
