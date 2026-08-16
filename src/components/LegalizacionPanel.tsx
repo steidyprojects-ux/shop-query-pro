@@ -6,6 +6,8 @@ import {
   listarVentas,
   registrarVenta,
   eliminarVenta,
+  copiarVenta,
+  exportarVentasCsv,
 } from "@/lib/ventas.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
