@@ -6,10 +6,11 @@ import { Search, ShieldCheck, Smartphone, Zap } from "lucide-react";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Visor Movilidad — Consulta de estado" },
-      { name: "description", content: "Consulta el estado de movilidad de Claro por cédula y ciudad. Rápido, seguro y fácil." },
-      { property: "og:title", content: "Visor Movilidad — Consulta de estado" },
-      { property: "og:description", content: "Consulta el estado de movilidad de Claro por cédula y ciudad." },
+      { title: "Best Seller — Consulta en un solo lugar" },
+      { name: "description", content: "Consulta el estado de tus clientes, nodos, tarifas y legaliza tus ventas en Best Seller." },
+      { property: "og:title", content: "Best Seller — Consulta en un solo lugar" },
+      { property: "og:description", content: "Consulta el estado de tus clientes, nodos, tarifas y legaliza tus ventas en Best Seller." },
+
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -28,12 +29,13 @@ function HomePage() {
             Consulta rápida y segura
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground sm:text-6xl">
-            Visor de Movilidad
+            Consulta en un solo lugar
           </h1>
           <p className="mt-6 text-lg text-muted-foreground sm:text-xl">
-            Consulta el estado de movilidad de tus clientes por cédula y ciudad.
-            Obtén resultados claros: aprobada, rechazada o con deuda.
+            Consulta el estado de tus clientes por cédula y ciudad. Obtén resultados claros: aprobada, rechazada o con deuda. 
+            No solo ello, códigos de tarifas, nodos y cobertura, cédula de asesor para digitar tus ventas según la regional.
           </p>
+
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg" className="gap-2 text-base">
               <Link to="/login">
