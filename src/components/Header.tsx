@@ -47,6 +47,13 @@ export function Header() {
               >
                 Tarifas
               </Link>
+              <Link
+                to="/legalizacion"
+                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+              >
+                Legalización
+              </Link>
+
 
               <Link
                 to="/admin"
