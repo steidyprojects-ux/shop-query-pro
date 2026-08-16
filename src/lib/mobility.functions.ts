@@ -25,10 +25,12 @@ const idSchema = z.object({
 export const consultarMovilidad = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => consultaSchema.parse(data))
-  .handler(async ({ data, context }) => {
-    const { supabase } = context;
+  .handler(async ({ data }) => {
+    // Lectura mediada por el servidor: la tabla no es legible directamente
+    // desde el navegador. Solo se devuelve la coincidencia exacta consultada.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: records, error } = await supabase
+    const { data: records, error } = await supabaseAdmin
       .from("mobility_records")
       .select("id, cedula, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at")
       .eq("cedula", data.cedula)
