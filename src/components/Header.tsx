@@ -21,8 +21,9 @@ export function Header() {
             <Search className="h-4 w-4" />
           </div>
           <span className="text-lg font-bold tracking-tight text-foreground">
-            Visor Movilidad
+            Best Seller
           </span>
+
         </Link>
 
         <nav className="flex items-center gap-3">
@@ -46,6 +47,13 @@ export function Header() {
               >
                 Tarifas
               </Link>
+              <Link
+                to="/legalizacion"
+                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+              >
+                Legalización
+              </Link>
+
 
               <Link
                 to="/admin"

@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedConsultaRouteImport } from './routes/_authenticated/consulta'
+import { Route as AuthenticatedLegalizacionRouteImport } from './routes/_authenticated/legalizacion'
 import { Route as AuthenticatedNodosRouteImport } from './routes/_authenticated/nodos'
 import { Route as AuthenticatedTarifasRouteImport } from './routes/_authenticated/tarifas'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -42,6 +43,12 @@ const AuthenticatedConsultaRoute = AuthenticatedConsultaRouteImport.update({
   path: '/consulta',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedLegalizacionRoute =
+  AuthenticatedLegalizacionRouteImport.update({
+    id: '/legalizacion',
+    path: '/legalizacion',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedNodosRoute = AuthenticatedNodosRouteImport.update({
   id: '/nodos',
   path: '/nodos',
@@ -63,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/consulta': typeof AuthenticatedConsultaRoute
+  '/legalizacion': typeof AuthenticatedLegalizacionRoute
   '/nodos': typeof AuthenticatedNodosRoute
   '/tarifas': typeof AuthenticatedTarifasRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -72,6 +80,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/consulta': typeof AuthenticatedConsultaRoute
+  '/legalizacion': typeof AuthenticatedLegalizacionRoute
   '/nodos': typeof AuthenticatedNodosRoute
   '/tarifas': typeof AuthenticatedTarifasRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -83,6 +92,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/consulta': typeof AuthenticatedConsultaRoute
+  '/_authenticated/legalizacion': typeof AuthenticatedLegalizacionRoute
   '/_authenticated/nodos': typeof AuthenticatedNodosRoute
   '/_authenticated/tarifas': typeof AuthenticatedTarifasRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/consulta'
+    | '/legalizacion'
     | '/nodos'
     | '/tarifas'
     | '/auth/callback'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin'
     | '/consulta'
+    | '/legalizacion'
     | '/nodos'
     | '/tarifas'
     | '/auth/callback'
@@ -113,6 +125,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/admin'
     | '/_authenticated/consulta'
+    | '/_authenticated/legalizacion'
     | '/_authenticated/nodos'
     | '/_authenticated/tarifas'
     | '/auth/callback'
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsultaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/legalizacion': {
+      id: '/_authenticated/legalizacion'
+      path: '/legalizacion'
+      fullPath: '/legalizacion'
+      preLoaderRoute: typeof AuthenticatedLegalizacionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/nodos': {
       id: '/_authenticated/nodos'
       path: '/nodos'
@@ -189,6 +209,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedConsultaRoute: typeof AuthenticatedConsultaRoute
+  AuthenticatedLegalizacionRoute: typeof AuthenticatedLegalizacionRoute
   AuthenticatedNodosRoute: typeof AuthenticatedNodosRoute
   AuthenticatedTarifasRoute: typeof AuthenticatedTarifasRoute
 }
@@ -196,6 +217,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedConsultaRoute: AuthenticatedConsultaRoute,
+  AuthenticatedLegalizacionRoute: AuthenticatedLegalizacionRoute,
   AuthenticatedNodosRoute: AuthenticatedNodosRoute,
   AuthenticatedTarifasRoute: AuthenticatedTarifasRoute,
 }
