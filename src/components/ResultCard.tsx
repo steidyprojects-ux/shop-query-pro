@@ -8,6 +8,7 @@ interface ResultCardProps {
     resultado: {
       id: string;
       cedula: string;
+      primer_apellido: string;
       ciudad: string;
       estado: string;
       observaciones: string | null;
@@ -82,12 +83,18 @@ export function ResultCard({ resultado }: ResultCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Cédula
             </p>
             <p className="text-lg font-semibold text-foreground">{record.cedula}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Primer apellido
+            </p>
+            <p className="text-lg font-semibold text-foreground">{record.primer_apellido}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">

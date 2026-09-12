@@ -11,12 +11,14 @@ import { Loader2, Search } from "lucide-react";
 
 export function ConsultaForm() {
   const [cedula, setCedula] = useState("");
+  const [primerApellido, setPrimerApellido] = useState("");
   const [ciudad, setCiudad] = useState("");
   const [resultado, setResultado] = useState<{
     encontrado: boolean;
     resultado: {
       id: string;
       cedula: string;
+      primer_apellido: string;
       ciudad: string;
       estado: string;
       observaciones: string | null;
@@ -39,7 +41,7 @@ export function ConsultaForm() {
     setResultado(null);
 
     try {
-      const data = await consultar({ data: { cedula: cedula.trim(), ciudad: ciudad.trim() } });
+      const data = await consultar({ data: { cedula: cedula.trim(), primer_apellido: primerApellido.trim(), ciudad: ciudad.trim() } });
       setResultado(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al consultar");
@@ -53,7 +55,7 @@ export function ConsultaForm() {
       <Card className="border-border/60">
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="cedula">Número de cédula</Label>
                 <Input
@@ -64,6 +66,18 @@ export function ConsultaForm() {
                   required
                   minLength={5}
                   maxLength={20}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="primerApellido">Primer apellido</Label>
+                <Input
+                  id="primerApellido"
+                  placeholder="Ej. Martínez"
+                  value={primerApellido}
+                  onChange={(e) => setPrimerApellido(e.target.value)}
+                  required
+                  minLength={2}
+                  maxLength={50}
                 />
               </div>
               <div className="space-y-2">
