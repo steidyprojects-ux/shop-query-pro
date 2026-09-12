@@ -192,18 +192,33 @@ export function AuthForm() {
             />
           </svg>
           Continuar con Google
-        </Button>
+            </Button>
 
-        <p className="text-center text-sm text-muted-foreground">
-          {isSignUp ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
-          <button
-            type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="font-medium text-primary underline-offset-4 hover:underline"
-          >
-            {isSignUp ? "Inicia sesión" : "Regístrate"}
-          </button>
-        </p>
+            <p className="text-center text-sm text-muted-foreground">
+              {isSignUp ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
+              <button
+                type="button"
+                onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null); }}
+                className="font-medium text-primary underline-offset-4 hover:underline"
+              >
+                {isSignUp ? "Inicia sesión" : "Regístrate"}
+              </button>
+            </p>
+          </>
+        )}
+
+        {isReset && (
+          <p className="text-center text-sm text-muted-foreground">
+            ¿Ya la recordaste?{" "}
+            <button
+              type="button"
+              onClick={() => { setIsReset(false); setError(null); setMessage(null); }}
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Volver a iniciar sesión
+            </button>
+          </p>
+        )}
       </CardContent>
     </Card>
   );
