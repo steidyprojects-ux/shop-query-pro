@@ -80,6 +80,7 @@ export type Database = {
           id: string
           nodo: string | null
           observaciones: string | null
+          primer_apellido: string | null
           tipo_red: string | null
           updated_at: string
         }
@@ -94,6 +95,7 @@ export type Database = {
           id?: string
           nodo?: string | null
           observaciones?: string | null
+          primer_apellido?: string | null
           tipo_red?: string | null
           updated_at?: string
         }
@@ -108,6 +110,7 @@ export type Database = {
           id?: string
           nodo?: string | null
           observaciones?: string | null
+          primer_apellido?: string | null
           tipo_red?: string | null
           updated_at?: string
         }
