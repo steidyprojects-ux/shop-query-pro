@@ -88,12 +88,14 @@ export function AuthForm() {
     <Card className="w-full max-w-md border-border/60 shadow-lg">
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold">
-          {isSignUp ? "Crear cuenta" : "Iniciar sesión"}
+          {isReset ? "Recuperar contraseña" : isSignUp ? "Crear cuenta" : "Iniciar sesión"}
         </CardTitle>
         <CardDescription>
-          {isSignUp
-            ? "Regístrate para empezar a consultar"
-            : "Ingresa tus credenciales para continuar"}
+          {isReset
+            ? "Te enviaremos un enlace a tu correo"
+            : isSignUp
+              ? "Regístrate para empezar a consultar"
+              : "Ingresa tus credenciales para continuar"}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
