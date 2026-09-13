@@ -40,6 +40,7 @@ import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 interface MobilityRecord {
   id: string;
   cedula: string;
+  primer_apellido: string | null;
   ciudad: string;
   estado: string;
   observaciones: string | null;
@@ -78,6 +79,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
   const [editing, setEditing] = useState<MobilityRecord | null>(null);
   const [form, setForm] = useState({
     cedula: "",
+    primer_apellido: "",
     ciudad: "",
     estado: "aprobada",
     observaciones: "",
@@ -88,7 +90,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
   });
 
   const resetForm = () => {
-    setForm({ cedula: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
+    setForm({ cedula: "", primer_apellido: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
     setEditing(null);
   };
 
