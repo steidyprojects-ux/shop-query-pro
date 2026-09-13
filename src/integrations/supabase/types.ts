@@ -166,19 +166,28 @@ export type Database = {
       }
       profiles: {
         Row: {
+          activo: boolean
+          cedula: string | null
           created_at: string
+          distrito: string | null
           email: string
           full_name: string | null
           id: string
         }
         Insert: {
+          activo?: boolean
+          cedula?: string | null
           created_at?: string
+          distrito?: string | null
           email: string
           full_name?: string | null
           id: string
         }
         Update: {
+          activo?: boolean
+          cedula?: string | null
           created_at?: string
+          distrito?: string | null
           email?: string
           full_name?: string | null
           id?: string
@@ -265,11 +274,13 @@ export type Database = {
           created_at: string
           created_by: string
           cuenta: string | null
+          empresa: string | null
           id: string
           nombre_cliente: string
           observaciones: string | null
           orden_trabajo: string | null
           telefono: string | null
+          tipo_acceso: string | null
           updated_at: string
         }
         Insert: {
@@ -279,11 +290,13 @@ export type Database = {
           created_at?: string
           created_by: string
           cuenta?: string | null
+          empresa?: string | null
           id?: string
           nombre_cliente: string
           observaciones?: string | null
           orden_trabajo?: string | null
           telefono?: string | null
+          tipo_acceso?: string | null
           updated_at?: string
         }
         Update: {
@@ -293,11 +306,13 @@ export type Database = {
           created_at?: string
           created_by?: string
           cuenta?: string | null
+          empresa?: string | null
           id?: string
           nombre_cliente?: string
           observaciones?: string | null
           orden_trabajo?: string | null
           telefono?: string | null
+          tipo_acceso?: string | null
           updated_at?: string
         }
         Relationships: []
