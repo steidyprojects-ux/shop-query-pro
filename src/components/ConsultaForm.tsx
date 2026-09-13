@@ -18,7 +18,7 @@ export function ConsultaForm() {
     resultado: {
       id: string;
       cedula: string;
-      primer_apellido: string;
+      primer_apellido: string | null;
       ciudad: string;
       estado: string;
       observaciones: string | null;

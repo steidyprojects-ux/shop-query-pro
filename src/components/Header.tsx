@@ -26,40 +26,38 @@ export function Header() {
 
         </Link>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
           {!loading && user ? (
             <>
               <Link
                 to="/consulta"
-                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
               >
                 Consultar
               </Link>
               <Link
                 to="/nodos"
-                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
               >
                 Nodos
               </Link>
               <Link
                 to="/tarifas"
-                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
               >
                 Tarifas
               </Link>
               <Link
                 to="/legalizacion"
-                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline"
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
               >
                 Legalización
               </Link>
 
-
               <Link
                 to="/admin"
-                className="hidden items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+                className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
               >
-
                 <Shield className="h-3.5 w-3.5" />
                 Admin
               </Link>

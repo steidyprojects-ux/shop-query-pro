@@ -40,6 +40,7 @@ import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 interface MobilityRecord {
   id: string;
   cedula: string;
+  primer_apellido: string | null;
   ciudad: string;
   estado: string;
   observaciones: string | null;
@@ -78,6 +79,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
   const [editing, setEditing] = useState<MobilityRecord | null>(null);
   const [form, setForm] = useState({
     cedula: "",
+    primer_apellido: "",
     ciudad: "",
     estado: "aprobada",
     observaciones: "",
@@ -88,7 +90,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
   });
 
   const resetForm = () => {
-    setForm({ cedula: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
+    setForm({ cedula: "", primer_apellido: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
     setEditing(null);
   };
 
@@ -102,6 +104,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           data: {
             id: editing.id,
             cedula: form.cedula,
+            primer_apellido: form.primer_apellido,
             ciudad: form.ciudad,
             estado: form.estado as "aprobada" | "rechazada" | "con_deuda",
             observaciones: form.observaciones,
@@ -115,6 +118,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
         await createFn({
           data: {
             cedula: form.cedula,
+            primer_apellido: form.primer_apellido,
             ciudad: form.ciudad,
             estado: form.estado as "aprobada" | "rechazada" | "con_deuda",
             observaciones: form.observaciones,
@@ -148,6 +152,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
     setEditing(record);
     setForm({
       cedula: record.cedula,
+      primer_apellido: record.primer_apellido ?? "",
       ciudad: record.ciudad,
       estado: record.estado,
       observaciones: record.observaciones ?? "",
@@ -186,6 +191,15 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                   id="cedula"
                   value={form.cedula}
                   onChange={(e) => setForm({ ...form, cedula: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="primer_apellido">Primer apellido</Label>
+                <Input
+                  id="primer_apellido"
+                  value={form.primer_apellido}
+                  onChange={(e) => setForm({ ...form, primer_apellido: e.target.value })}
                   required
                 />
               </div>
@@ -279,6 +293,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableHeader>
             <TableRow>
               <TableHead>Cédula</TableHead>
+              <TableHead className="hidden md:table-cell">Primer apellido</TableHead>
               <TableHead>Ciudad</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="hidden lg:table-cell">Nodo</TableHead>
@@ -292,14 +307,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="py-8 text-center">
+                <TableCell colSpan={10} className="py-8 text-center">
                   <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
                 </TableCell>
               </TableRow>
             ) : records.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={9}
+                  colSpan={10}
                   className="py-8 text-center text-muted-foreground"
                 >
                   No hay registros aún.
@@ -309,6 +324,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               records.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell className="font-medium">{record.cedula}</TableCell>
+                  <TableCell className="hidden md:table-cell">{record.primer_apellido ?? "—"}</TableCell>
                   <TableCell>{record.ciudad}</TableCell>
                   <TableCell>
                     <Badge variant={estadoVariant[record.estado] ?? "outline"}>
