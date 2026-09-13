@@ -94,7 +94,7 @@ export function ResultCard({ resultado }: ResultCardProps) {
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Primer apellido
             </p>
-            <p className="text-lg font-semibold text-foreground">{record.primer_apellido}</p>
+            <p className="text-lg font-semibold text-foreground">{record.primer_apellido ?? "—"}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
