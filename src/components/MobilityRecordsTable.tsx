@@ -150,6 +150,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
     setEditing(record);
     setForm({
       cedula: record.cedula,
+      primer_apellido: record.primer_apellido ?? "",
       ciudad: record.ciudad,
       estado: record.estado,
       observaciones: record.observaciones ?? "",
