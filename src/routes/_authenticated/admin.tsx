@@ -53,10 +53,19 @@ function AdminPage() {
           Administración
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Gestiona los registros de movilidad disponibles para consulta.
+          Gestiona los registros de movilidad y las cuentas de los asesores.
         </p>
       </div>
-      <MobilityRecordsTable records={records ?? []} isLoading={recordsLoading} />
+
+      <section className="mb-12 space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Asesores registrados</h2>
+        <AsesoresPanel />
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Registros de movilidad</h2>
+        <MobilityRecordsTable records={records ?? []} isLoading={recordsLoading} />
+      </section>
     </main>
   );
 }
