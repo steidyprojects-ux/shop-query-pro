@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { verificarAdmin, listarRegistros } from "@/lib/mobility.functions";
 import { MobilityRecordsTable } from "@/components/MobilityRecordsTable";
+import { AsesoresPanel } from "@/components/AsesoresPanel";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
