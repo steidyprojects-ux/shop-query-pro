@@ -24,32 +24,125 @@ const idSchema = z.object({
   id: z.string().uuid(),
 });
 
-export const consultarMovilidad = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((data) => consultaSchema.parse(data))
-  .handler(async ({ data }) => {
-    // Lectura mediada por el servidor: la tabla no es legible directamente
-    // desde el navegador. Solo se devuelve la coincidencia exacta consultada.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+const RECORD_COLS =
+  "id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at";
 
-    const { data: records, error } = await supabaseAdmin
-      .from("mobility_records")
-      .select("id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at")
-      .eq("cedula", data.cedula)
-      .ilike("primer_apellido", data.primer_apellido)
-      .ilike("ciudad", data.ciudad)
-      .order("created_at", { ascending: false })
-      .limit(1);
+/** Convierte el texto de "Observaciones" del Visor en el enum estado de nuestra tabla. */
+function estadoDesdeObservaciones(observaciones: string): "aprobada" | "rechazada" | "con_deuda" {
+  if (/RECHAZADO/i.test(observaciones)) return "rechazada";
+  if (/(DEUDA|MORA|CARTERA)/i.test(observaciones)) return "con_deuda";
+  return "aprobada";
+}
 
-    if (error) {
-      console.error("Error consultando movilidad:", error);
-      throw new Error("No se pudo realizar la consulta. Intenta de nuevo.");
+// ============================================================
+// Llama al servicio de Playwright en el VPS que consulta en vivo
+// el portal Visor Movilidad de Claro (mismo servidor que SIAPP,
+// misma API key, ruta distinta).
+// ============================================================
+async function consultarVisorEnVivo(input: {
+  cedula: string;
+  apellido: string;
+  ciudad: string;
+}): Promise<
+  | { ok: true; texto: string; observaciones: string; necesitaEscalar: boolean }
+  | { ok: false; error: string }
+> {
+  const url = process.env.VISOR_API_URL;
+  const apiKey = process.env.SIAPP_API_KEY; // misma clave compartida del servidor api-lovable
+
+  if (!url || !apiKey) {
+    return { ok: false, error: "Integración con el Visor no configurada." };
+  }
+
+  try {
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify(input),
+      // El login + formulario + modal en el portal real puede tardar hasta ~1 minuto.
+      signal: AbortSignal.timeout(90000),
+    });
+
+    const json = (await respuesta.json().catch(() => null)) as
+      | { ok?: boolean; texto?: string; observaciones?: string; necesitaEscalar?: boolean; error?: string }
+      | null;
+
+    if (!respuesta.ok || !json?.ok) {
+      return { ok: false, error: json?.error ?? `Error HTTP ${respuesta.status}` };
     }
 
     return {
-      encontrado: records && records.length > 0,
-      resultado: records?.[0] ?? null,
+      ok: true,
+      texto: json.texto ?? "",
+      observaciones: json.observaciones ?? "",
+      necesitaEscalar: json.necesitaEscalar ?? false,
     };
+  } catch (e) {
+    console.error("Error llamando al servicio del Visor:", e);
+    return { ok: false, error: e instanceof Error ? e.message : "Error desconocido" };
+  }
+}
+
+export const consultarMovilidad = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data) => consultaSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const live = await consultarVisorEnVivo({
+      cedula: data.cedula,
+      apellido: data.primer_apellido,
+      ciudad: data.ciudad,
+    });
+
+    if (!live.ok) {
+      // El Visor falló o no está configurado: avisamos claro, sin inventar un resultado.
+      throw new Error("No se pudo consultar el Visor en este momento: " + live.error);
+    }
+
+    const estado = estadoDesdeObservaciones(live.observaciones);
+
+    // Guardamos el resultado como historial, igual que antes hacía crearRegistro.
+    const { data: registro, error } = await supabase
+      .from("mobility_records")
+      .insert({
+        cedula: data.cedula,
+        primer_apellido: data.primer_apellido,
+        ciudad: data.ciudad,
+        estado,
+        observaciones: live.observaciones || live.texto || null,
+        created_by: userId,
+      })
+      .select(RECORD_COLS)
+      .single();
+
+    if (error) {
+      console.error("Error guardando historial de consulta:", error);
+      // La consulta en vivo sí funcionó; devolvemos el resultado aunque no se
+      // haya podido guardar el historial, para no dejar al asesor sin respuesta.
+      return {
+        encontrado: true,
+        resultado: {
+          id: "",
+          cedula: data.cedula,
+          primer_apellido: data.primer_apellido,
+          ciudad: data.ciudad,
+          estado,
+          observaciones: live.observaciones || live.texto || null,
+          nodo: null,
+          tipo_red: null,
+          direccion: null,
+          cedula_asesor: null,
+          created_at: new Date().toISOString(),
+        },
+        necesitaEscalar: live.necesitaEscalar,
+      };
+    }
+
+    return { encontrado: true, resultado: registro, necesitaEscalar: live.necesitaEscalar };
   });
 
 export const listarRegistros = createServerFn({ method: "GET" })
@@ -68,7 +161,9 @@ export const listarRegistros = createServerFn({ method: "GET" })
 
     const { data: records, error } = await supabase
       .from("mobility_records")
-      .select("id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at")
+      .select(
+        "id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -108,7 +203,7 @@ export const crearRegistro = createServerFn({ method: "POST" })
         cedula_asesor: data.cedula_asesor ?? null,
         created_by: userId,
       })
-      .select("id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at")
+      .select(RECORD_COLS)
       .single();
 
     if (error) {
@@ -165,7 +260,9 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
       .from("mobility_records")
       .update(updates)
       .eq("id", id)
-      .select("id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at")
+      .select(
+        "id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
+      )
       .single();
 
     if (error) {
