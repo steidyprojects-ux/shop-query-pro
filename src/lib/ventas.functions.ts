@@ -9,14 +9,15 @@ const ventaSchema = z.object({
   cuenta: z.string().max(30).optional(),
   orden_trabajo: z.string().max(30).optional(),
   cedula_vendedor: z.string().min(5).max(20).trim(),
-  ciudad: z.string().max(60).optional(),
+  empresa: z.enum(["MOVILCO", "ALIADO"]).optional(),
+  tipo_acceso: z.enum(["@", "DOBLE", "TRIPLE"]).optional(),
   observaciones: z.string().max(500).optional(),
 });
 
 const idSchema = z.object({ id: z.string().uuid() });
 
 const SELECT_COLS =
-  "id, nombre_cliente, cedula_cliente, telefono, cuenta, orden_trabajo, cedula_vendedor, ciudad, observaciones, created_at";
+  "id, nombre_cliente, cedula_cliente, telefono, cuenta, orden_trabajo, cedula_vendedor, empresa, tipo_acceso, observaciones, created_at";
 
 export const listarVentas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -49,7 +50,15 @@ async function intentarRegistrarEnSiapp(data: {
   nombre_cliente: string;
   telefono?: string;
   cedula_vendedor: string;
-}): Promise<{ ok: boolean; error?: string }> {
+  empresa?: string;
+}): Promise<{ ok: boolean; error?: string; omitido?: boolean }> {
+  // SIAPP solo aplica para ventas MOVILCO. Las de ALIADO se registran
+  // en Supabase igual, pero nunca se mandan al portal SIAPP.
+  // El "tipo_acceso" tampoco se envía: SIAPP no maneja ese dato.
+  if (data.empresa !== "MOVILCO") {
+    return { ok: false, omitido: true, error: "Empresa distinta de MOVILCO: no se registra en SIAPP." };
+  }
+
   const url = process.env.SIAPP_API_URL;
   const apiKey = process.env.SIAPP_API_KEY;
 
@@ -108,7 +117,8 @@ export const registrarVenta = createServerFn({ method: "POST" })
         cuenta: data.cuenta || null,
         orden_trabajo: data.orden_trabajo || null,
         cedula_vendedor: data.cedula_vendedor,
-        ciudad: data.ciudad || null,
+        empresa: data.empresa || null,
+        tipo_acceso: data.tipo_acceso || null,
         observaciones: data.observaciones || null,
         created_by: userId,
       })
@@ -121,10 +131,10 @@ export const registrarVenta = createServerFn({ method: "POST" })
     }
 
     // La venta ya está guardada en tu historial (Supabase) pase lo que pase.
-    // Ahora intentamos también el registro automático en SIAPP.
+    // Ahora intentamos también el registro automático en SIAPP (solo si es MOVILCO).
     const siapp = await intentarRegistrarEnSiapp(data);
 
-    return { ...venta, siappOk: siapp.ok, siappError: siapp.error };
+    return { ...venta, siappOk: siapp.ok, siappOmitido: siapp.omitido ?? false, siappError: siapp.error };
   });
 
 export const actualizarVenta = createServerFn({ method: "POST" })
@@ -141,7 +151,8 @@ export const actualizarVenta = createServerFn({ method: "POST" })
       cuenta?: string | null;
       orden_trabajo?: string | null;
       cedula_vendedor?: string;
-      ciudad?: string | null;
+      empresa?: string | null;
+      tipo_acceso?: string | null;
       observaciones?: string | null;
     } = {};
 
@@ -151,12 +162,12 @@ export const actualizarVenta = createServerFn({ method: "POST" })
     if (rest.telefono !== undefined) updates.telefono = rest.telefono || null;
     if (rest.cuenta !== undefined) updates.cuenta = rest.cuenta || null;
     if (rest.orden_trabajo !== undefined) updates.orden_trabajo = rest.orden_trabajo || null;
-    if (rest.ciudad !== undefined) updates.ciudad = rest.ciudad || null;
+    if (rest.empresa !== undefined) updates.empresa = rest.empresa || null;
+    if (rest.tipo_acceso !== undefined) updates.tipo_acceso = rest.tipo_acceso || null;
     if (rest.observaciones !== undefined) updates.observaciones = rest.observaciones || null;
 
     const { data: venta, error } = await supabase
       .from("ventas_siap")
-
       .update(updates)
       .eq("id", id)
       .select(SELECT_COLS)
@@ -262,7 +273,8 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
       "Cuenta",
       "Orden de trabajo",
       "Cédula vendedor",
-      "Ciudad",
+      "Empresa",
+      "Tipo de acceso",
       "Observaciones",
     ];
     const rows = filas.map((v) => [
@@ -273,7 +285,8 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
       v.cuenta ?? "",
       v.orden_trabajo ?? "",
       v.cedula_vendedor,
-      v.ciudad ?? "",
+      v.empresa ?? "",
+      v.tipo_acceso ?? "",
       v.observaciones ?? "",
     ]);
     const csv = [headers, ...rows]
