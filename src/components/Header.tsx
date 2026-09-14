@@ -1,12 +1,23 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { verificarAdmin } from "@/lib/mobility.functions";
 import { LogOut, Search, Shield, User } from "lucide-react";
 
 export function Header() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const checkAdmin = useServerFn(verificarAdmin);
+
+  const { data: adminData } = useQuery({
+    queryKey: ["isAdmin"],
+    queryFn: () => checkAdmin(),
+    enabled: !!user,
+  });
+  const isAdmin = adminData?.isAdmin === true;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -54,13 +65,15 @@ export function Header() {
                 Legalización
               </Link>
 
-              <Link
-                to="/admin"
-                className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
-              >
-                <Shield className="h-3.5 w-3.5" />
-                Admin
-              </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
+                >
+                  <Shield className="h-3.5 w-3.5" />
+                  Admin
+                </Link>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
