@@ -14,6 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Plus, Trash2, Download, Copy, FileText } from "lucide-react";
 
 interface Venta {
@@ -25,6 +32,8 @@ interface Venta {
   orden_trabajo: string | null;
   cedula_vendedor: string;
   ciudad: string | null;
+  empresa: string | null;
+  tipo_acceso: string | null;
   observaciones: string | null;
   created_at: string;
 }
@@ -37,6 +46,8 @@ const emptyForm = {
   orden_trabajo: "",
   cedula_vendedor: "",
   ciudad: "",
+  empresa: "",
+  tipo_acceso: "",
   observaciones: "",
 };
 
@@ -63,7 +74,13 @@ export function LegalizacionPanel() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await createFn({ data: form });
+      await createFn({
+        data: {
+          ...form,
+          empresa: (form.empresa || undefined) as "MOVILCO" | "ALIADO" | undefined,
+          tipo_acceso: (form.tipo_acceso || undefined) as "@" | "DOBLE" | "TRIPLE" | undefined,
+        },
+      });
       await queryClient.invalidateQueries({ queryKey: ["ventasSiap"] });
       setForm({ ...emptyForm, cedula_vendedor: form.cedula_vendedor });
       toast.success("Venta registrada");
@@ -190,6 +207,31 @@ export function LegalizacionPanel() {
                   placeholder="PEREIRA"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="empresa">Empresa</Label>
+                <Select value={form.empresa} onValueChange={(v) => set("empresa", v)}>
+                  <SelectTrigger id="empresa">
+                    <SelectValue placeholder="Selecciona la empresa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MOVILCO">MOVILCO</SelectItem>
+                    <SelectItem value="ALIADO">ALIADO</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tipo_acceso">Tipo de acceso</Label>
+                <Select value={form.tipo_acceso} onValueChange={(v) => set("tipo_acceso", v)}>
+                  <SelectTrigger id="tipo_acceso">
+                    <SelectValue placeholder="Selecciona el tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="@">@</SelectItem>
+                    <SelectItem value="DOBLE">DOBLE</SelectItem>
+                    <SelectItem value="TRIPLE">TRIPLE</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="observaciones">Observaciones</Label>
                 <Textarea
@@ -256,6 +298,9 @@ export function LegalizacionPanel() {
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Cuenta: {v.cuenta ?? "—"} · OT: {v.orden_trabajo ?? "—"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {v.empresa ?? "—"} · Acceso: {v.tipo_acceso ?? "—"}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       Vendedor {v.cedula_vendedor} ·{" "}
