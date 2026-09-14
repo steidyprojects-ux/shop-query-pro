@@ -1,0 +1,1 @@
+ALTER TABLE public.ventas_siap DROP COLUMN IF EXISTS ciudad;

@@ -270,7 +270,6 @@ export type Database = {
         Row: {
           cedula_cliente: string
           cedula_vendedor: string
-          ciudad: string | null
           created_at: string
           created_by: string
           cuenta: string | null
@@ -286,7 +285,6 @@ export type Database = {
         Insert: {
           cedula_cliente: string
           cedula_vendedor: string
-          ciudad?: string | null
           created_at?: string
           created_by: string
           cuenta?: string | null
@@ -302,7 +300,6 @@ export type Database = {
         Update: {
           cedula_cliente?: string
           cedula_vendedor?: string
-          ciudad?: string | null
           created_at?: string
           created_by?: string
           cuenta?: string | null
