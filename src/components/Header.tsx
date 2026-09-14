@@ -65,13 +65,15 @@ export function Header() {
                 Legalización
               </Link>
 
-              <Link
-                to="/admin"
-                className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
-              >
-                <Shield className="h-3.5 w-3.5" />
-                Admin
-              </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:text-sm"
+                >
+                  <Shield className="h-3.5 w-3.5" />
+                  Admin
+                </Link>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
