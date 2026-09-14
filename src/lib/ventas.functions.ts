@@ -9,15 +9,14 @@ const ventaSchema = z.object({
   cuenta: z.string().max(30).optional(),
   orden_trabajo: z.string().max(30).optional(),
   cedula_vendedor: z.string().min(5).max(20).trim(),
-  empresa: z.enum(["MOVILCO", "ALIADO"]).optional(),
-  tipo_acceso: z.enum(["@", "DOBLE", "TRIPLE"]).optional(),
+  ciudad: z.string().max(60).optional(),
   observaciones: z.string().max(500).optional(),
 });
 
 const idSchema = z.object({ id: z.string().uuid() });
 
 const SELECT_COLS =
-  "id, nombre_cliente, cedula_cliente, telefono, cuenta, orden_trabajo, cedula_vendedor, empresa, tipo_acceso, observaciones, created_at";
+  "id, nombre_cliente, cedula_cliente, telefono, cuenta, orden_trabajo, cedula_vendedor, ciudad, observaciones, created_at";
 
 export const listarVentas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -37,6 +36,63 @@ export const listarVentas = createServerFn({ method: "GET" })
     return data ?? [];
   });
 
+// ============================================================
+// Llama al servicio de Playwright en el VPS para registrar la
+// venta directamente en SIAPP. Nunca lanza: si falla, se lo
+// reportamos al frontend como advertencia, pero la venta ya
+// quedó guardada en Supabase de todas formas.
+// ============================================================
+async function intentarRegistrarEnSiapp(data: {
+  cuenta?: string;
+  orden_trabajo?: string;
+  cedula_cliente: string;
+  nombre_cliente: string;
+  telefono?: string;
+  cedula_vendedor: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const url = process.env.SIAPP_API_URL;
+  const apiKey = process.env.SIAPP_API_KEY;
+
+  if (!url || !apiKey) {
+    console.error("SIAPP_API_URL o SIAPP_API_KEY no configuradas — se omite el registro automático en SIAPP.");
+    return { ok: false, error: "Integración con SIAPP no configurada." };
+  }
+
+  if (!data.cuenta || !data.orden_trabajo) {
+    return { ok: false, error: "Falta cuenta u orden de trabajo para registrar en SIAPP." };
+  }
+
+  try {
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        cuenta: data.cuenta,
+        ordenTrabajo: data.orden_trabajo,
+        cedulaCliente: data.cedula_cliente,
+        nombreCliente: data.nombre_cliente,
+        celular: data.telefono ?? "",
+        cedulaVendedor: data.cedula_vendedor,
+      }),
+      // Playwright puede tardar hasta ~1.5 minutos en cargar y llenar el formulario real.
+      signal: AbortSignal.timeout(120000),
+    });
+
+    const json = (await respuesta.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+
+    if (!respuesta.ok || !json?.ok) {
+      return { ok: false, error: json?.error ?? `Error HTTP ${respuesta.status}` };
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error("Error llamando al servicio de SIAPP:", e);
+    return { ok: false, error: e instanceof Error ? e.message : "Error desconocido" };
+  }
+}
+
 export const registrarVenta = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data) => ventaSchema.parse(data))
@@ -52,8 +108,7 @@ export const registrarVenta = createServerFn({ method: "POST" })
         cuenta: data.cuenta || null,
         orden_trabajo: data.orden_trabajo || null,
         cedula_vendedor: data.cedula_vendedor,
-        empresa: data.empresa || null,
-        tipo_acceso: data.tipo_acceso || null,
+        ciudad: data.ciudad || null,
         observaciones: data.observaciones || null,
         created_by: userId,
       })
@@ -65,7 +120,11 @@ export const registrarVenta = createServerFn({ method: "POST" })
       throw new Error("No se pudo registrar la venta.");
     }
 
-    return venta;
+    // La venta ya está guardada en tu historial (Supabase) pase lo que pase.
+    // Ahora intentamos también el registro automático en SIAPP.
+    const siapp = await intentarRegistrarEnSiapp(data);
+
+    return { ...venta, siappOk: siapp.ok, siappError: siapp.error };
   });
 
 export const actualizarVenta = createServerFn({ method: "POST" })
@@ -82,8 +141,7 @@ export const actualizarVenta = createServerFn({ method: "POST" })
       cuenta?: string | null;
       orden_trabajo?: string | null;
       cedula_vendedor?: string;
-      empresa?: string | null;
-      tipo_acceso?: string | null;
+      ciudad?: string | null;
       observaciones?: string | null;
     } = {};
 
@@ -93,8 +151,7 @@ export const actualizarVenta = createServerFn({ method: "POST" })
     if (rest.telefono !== undefined) updates.telefono = rest.telefono || null;
     if (rest.cuenta !== undefined) updates.cuenta = rest.cuenta || null;
     if (rest.orden_trabajo !== undefined) updates.orden_trabajo = rest.orden_trabajo || null;
-    if (rest.empresa !== undefined) updates.empresa = rest.empresa || null;
-    if (rest.tipo_acceso !== undefined) updates.tipo_acceso = rest.tipo_acceso || null;
+    if (rest.ciudad !== undefined) updates.ciudad = rest.ciudad || null;
     if (rest.observaciones !== undefined) updates.observaciones = rest.observaciones || null;
 
     const { data: venta, error } = await supabase
@@ -164,8 +221,6 @@ export const copiarVenta = createServerFn({ method: "POST" })
         `Cuenta: ${venta.cuenta ?? ""}`,
         `Orden de Trabajo: ${venta.orden_trabajo ?? ""}`,
         `Cédula del vendedor: ${venta.cedula_vendedor}`,
-        venta.empresa ? `Empresa: ${venta.empresa}` : "",
-        venta.tipo_acceso ? `Tipo de acceso: ${venta.tipo_acceso}` : "",
       ]
         .filter(Boolean)
         .join("\n"),
@@ -207,8 +262,7 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
       "Cuenta",
       "Orden de trabajo",
       "Cédula vendedor",
-      "Empresa",
-      "Tipo de acceso",
+      "Ciudad",
       "Observaciones",
     ];
     const rows = filas.map((v) => [
@@ -219,8 +273,7 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
       v.cuenta ?? "",
       v.orden_trabajo ?? "",
       v.cedula_vendedor,
-      v.empresa ?? "",
-      v.tipo_acceso ?? "",
+      v.ciudad ?? "",
       v.observaciones ?? "",
     ]);
     const csv = [headers, ...rows]
