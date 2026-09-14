@@ -9,7 +9,6 @@ const ventaSchema = z.object({
   cuenta: z.string().max(30).optional(),
   orden_trabajo: z.string().max(30).optional(),
   cedula_vendedor: z.string().min(5).max(20).trim(),
-  ciudad: z.string().max(60).optional(),
   empresa: z.enum(["MOVILCO", "ALIADO"]).optional(),
   tipo_acceso: z.enum(["@", "DOBLE", "TRIPLE"]).optional(),
   observaciones: z.string().max(500).optional(),
@@ -18,7 +17,7 @@ const ventaSchema = z.object({
 const idSchema = z.object({ id: z.string().uuid() });
 
 const SELECT_COLS =
-  "id, nombre_cliente, cedula_cliente, telefono, cuenta, orden_trabajo, cedula_vendedor, ciudad, empresa, tipo_acceso, observaciones, created_at";
+  "id, nombre_cliente, cedula_cliente, telefono, cuenta, orden_trabajo, cedula_vendedor, empresa, tipo_acceso, observaciones, created_at";
 
 export const listarVentas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -53,7 +52,6 @@ export const registrarVenta = createServerFn({ method: "POST" })
         cuenta: data.cuenta || null,
         orden_trabajo: data.orden_trabajo || null,
         cedula_vendedor: data.cedula_vendedor,
-        ciudad: data.ciudad || null,
         empresa: data.empresa || null,
         tipo_acceso: data.tipo_acceso || null,
         observaciones: data.observaciones || null,
@@ -84,7 +82,6 @@ export const actualizarVenta = createServerFn({ method: "POST" })
       cuenta?: string | null;
       orden_trabajo?: string | null;
       cedula_vendedor?: string;
-      ciudad?: string | null;
       empresa?: string | null;
       tipo_acceso?: string | null;
       observaciones?: string | null;
@@ -96,7 +93,6 @@ export const actualizarVenta = createServerFn({ method: "POST" })
     if (rest.telefono !== undefined) updates.telefono = rest.telefono || null;
     if (rest.cuenta !== undefined) updates.cuenta = rest.cuenta || null;
     if (rest.orden_trabajo !== undefined) updates.orden_trabajo = rest.orden_trabajo || null;
-    if (rest.ciudad !== undefined) updates.ciudad = rest.ciudad || null;
     if (rest.empresa !== undefined) updates.empresa = rest.empresa || null;
     if (rest.tipo_acceso !== undefined) updates.tipo_acceso = rest.tipo_acceso || null;
     if (rest.observaciones !== undefined) updates.observaciones = rest.observaciones || null;
@@ -211,7 +207,6 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
       "Cuenta",
       "Orden de trabajo",
       "Cédula vendedor",
-      "Ciudad",
       "Empresa",
       "Tipo de acceso",
       "Observaciones",
@@ -224,7 +219,6 @@ export const exportarVentasCsv = createServerFn({ method: "POST" })
       v.cuenta ?? "",
       v.orden_trabajo ?? "",
       v.cedula_vendedor,
-      v.ciudad ?? "",
       v.empresa ?? "",
       v.tipo_acceso ?? "",
       v.observaciones ?? "",

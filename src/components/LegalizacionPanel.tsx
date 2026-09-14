@@ -31,7 +31,6 @@ interface Venta {
   cuenta: string | null;
   orden_trabajo: string | null;
   cedula_vendedor: string;
-  ciudad: string | null;
   empresa: string | null;
   tipo_acceso: string | null;
   observaciones: string | null;
@@ -45,7 +44,6 @@ const emptyForm = {
   cuenta: "",
   orden_trabajo: "",
   cedula_vendedor: "",
-  ciudad: "",
   empresa: "",
   tipo_acceso: "",
   observaciones: "",
@@ -199,15 +197,6 @@ export function LegalizacionPanel() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ciudad">Ciudad</Label>
-                <Input
-                  id="ciudad"
-                  value={form.ciudad}
-                  onChange={(e) => set("ciudad", e.target.value)}
-                  placeholder="PEREIRA"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="empresa">Empresa</Label>
                 <Select value={form.empresa} onValueChange={(v) => set("empresa", v)}>
                   <SelectTrigger id="empresa">
@@ -294,7 +283,6 @@ export function LegalizacionPanel() {
                     <p className="text-sm text-muted-foreground">
                       CC {v.cedula_cliente}
                       {v.telefono ? ` · ${v.telefono}` : ""}
-                      {v.ciudad ? ` · ${v.ciudad}` : ""}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Cuenta: {v.cuenta ?? "—"} · OT: {v.orden_trabajo ?? "—"}
