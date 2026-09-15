@@ -12,6 +12,8 @@ interface ResultCardProps {
       ciudad: string;
       estado: string;
       observaciones: string | null;
+      nombre_completo: string | null;
+      consejo: string | null;
       nodo: string | null;
       tipo_red: string | null;
       direccion: string | null;
