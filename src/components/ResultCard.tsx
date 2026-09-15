@@ -12,6 +12,8 @@ interface ResultCardProps {
       ciudad: string;
       estado: string;
       observaciones: string | null;
+      nombre_completo: string | null;
+      consejo: string | null;
       nodo: string | null;
       tipo_red: string | null;
       direccion: string | null;
@@ -83,12 +85,18 @@ export function ResultCard({ resultado }: ResultCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Cédula
             </p>
             <p className="text-lg font-semibold text-foreground">{record.cedula}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Nombre completo
+            </p>
+            <p className="text-lg font-semibold text-foreground">{record.nombre_completo ?? "—"}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -124,11 +132,13 @@ export function ResultCard({ resultado }: ResultCardProps) {
 
 
 
-        <div className={`flex items-center gap-3 rounded-lg border border-border/60 bg-muted/40 p-4 ${config.color}`}>
+        <div className={`flex items-start gap-3 rounded-lg border border-border/60 bg-muted/40 p-4 ${config.color}`}>
           {config.icon}
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="font-semibold">{config.label}</p>
-            {record.observaciones ? (
+            {record.consejo ? (
+              <p className="text-sm text-muted-foreground">{record.consejo}</p>
+            ) : record.observaciones ? (
               <p className="text-sm text-muted-foreground">{record.observaciones}</p>
             ) : (
               <p className="text-sm text-muted-foreground">Sin observaciones adicionales.</p>

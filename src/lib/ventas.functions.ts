@@ -44,13 +44,13 @@ export const listarVentas = createServerFn({ method: "GET" })
 // quedó guardada en Supabase de todas formas.
 // ============================================================
 async function intentarRegistrarEnSiapp(data: {
-  cuenta?: string;
-  orden_trabajo?: string;
+  cuenta?: string | undefined;
+  orden_trabajo?: string | undefined;
   cedula_cliente: string;
   nombre_cliente: string;
-  telefono?: string;
+  telefono?: string | undefined;
   cedula_vendedor: string;
-  empresa?: string;
+  empresa?: string | undefined;
 }): Promise<{ ok: boolean; error?: string; omitido?: boolean }> {
   // SIAPP solo aplica para ventas MOVILCO. Las de ALIADO se registran
   // en Supabase igual, pero nunca se mandan al portal SIAPP.
@@ -59,8 +59,8 @@ async function intentarRegistrarEnSiapp(data: {
     return { ok: false, omitido: true, error: "Empresa distinta de MOVILCO: no se registra en SIAPP." };
   }
 
-  const url = process.env.SIAPP_API_URL;
-  const apiKey = process.env.SIAPP_API_KEY;
+  const url = process.env['SIAPP_API_URL'];
+  const apiKey = process.env['SIAPP_API_KEY'];
 
   if (!url || !apiKey) {
     console.error("SIAPP_API_URL o SIAPP_API_KEY no configuradas — se omite el registro automático en SIAPP.");

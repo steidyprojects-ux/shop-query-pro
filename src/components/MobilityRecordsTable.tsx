@@ -44,6 +44,8 @@ interface MobilityRecord {
   ciudad: string;
   estado: string;
   observaciones: string | null;
+  nombre_completo: string | null;
+  consejo: string | null;
   nodo: string | null;
   tipo_red: string | null;
   direccion: string | null;
@@ -83,6 +85,8 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
     ciudad: "",
     estado: "aprobada",
     observaciones: "",
+    nombre_completo: "",
+    consejo: "",
     nodo: "",
     tipo_red: "",
     direccion: "",
@@ -90,7 +94,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
   });
 
   const resetForm = () => {
-    setForm({ cedula: "", primer_apellido: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
+    setForm({ cedula: "", primer_apellido: "", ciudad: "", estado: "aprobada", observaciones: "", nombre_completo: "", consejo: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
     setEditing(null);
   };
 
@@ -108,6 +112,8 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
             ciudad: form.ciudad,
             estado: form.estado as "aprobada" | "rechazada" | "con_deuda",
             observaciones: form.observaciones,
+            nombre_completo: form.nombre_completo,
+            consejo: form.consejo,
             nodo: form.nodo,
             tipo_red: form.tipo_red,
             direccion: form.direccion,
@@ -122,6 +128,8 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
             ciudad: form.ciudad,
             estado: form.estado as "aprobada" | "rechazada" | "con_deuda",
             observaciones: form.observaciones,
+            nombre_completo: form.nombre_completo,
+            consejo: form.consejo,
             nodo: form.nodo,
             tipo_red: form.tipo_red,
             direccion: form.direccion,
@@ -156,6 +164,8 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
       ciudad: record.ciudad,
       estado: record.estado,
       observaciones: record.observaciones ?? "",
+      nombre_completo: record.nombre_completo ?? "",
+      consejo: record.consejo ?? "",
       nodo: record.nodo ?? "",
       tipo_red: record.tipo_red ?? "",
       direccion: record.direccion ?? "",
@@ -212,6 +222,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="nombre_completo">Nombre completo</Label>
+                <Input
+                  id="nombre_completo"
+                  value={form.nombre_completo}
+                  onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
@@ -266,6 +284,15 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               </div>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="consejo">Consejo</Label>
+              <Textarea
+                id="consejo"
+                value={form.consejo}
+                onChange={(e) => setForm({ ...form, consejo: e.target.value })}
+                rows={2}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="observaciones">Observaciones</Label>
               <Textarea
                 id="observaciones"
@@ -293,6 +320,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableHeader>
             <TableRow>
               <TableHead>Cédula</TableHead>
+              <TableHead className="hidden md:table-cell">Nombre completo</TableHead>
               <TableHead className="hidden md:table-cell">Primer apellido</TableHead>
               <TableHead>Ciudad</TableHead>
               <TableHead>Estado</TableHead>
@@ -300,6 +328,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               <TableHead className="hidden lg:table-cell">Tipo de red</TableHead>
               <TableHead className="hidden xl:table-cell">Dirección</TableHead>
               <TableHead className="hidden xl:table-cell">Cédula asesor</TableHead>
+              <TableHead className="hidden md:table-cell">Consejo</TableHead>
               <TableHead className="hidden md:table-cell">Observaciones</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -307,14 +336,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={10} className="py-8 text-center">
+                <TableCell colSpan={12} className="py-8 text-center">
                   <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
                 </TableCell>
               </TableRow>
             ) : records.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={10}
+                  colSpan={12}
                   className="py-8 text-center text-muted-foreground"
                 >
                   No hay registros aún.
@@ -324,6 +353,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               records.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell className="font-medium">{record.cedula}</TableCell>
+                  <TableCell className="hidden md:table-cell">{record.nombre_completo ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{record.primer_apellido ?? "—"}</TableCell>
                   <TableCell>{record.ciudad}</TableCell>
                   <TableCell>
@@ -336,6 +366,9 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                   <TableCell className="hidden lg:table-cell">{record.tipo_red ?? "—"}</TableCell>
                   <TableCell className="hidden max-w-xs truncate xl:table-cell">{record.direccion ?? "—"}</TableCell>
                   <TableCell className="hidden xl:table-cell">{record.cedula_asesor ?? "—"}</TableCell>
+                  <TableCell className="hidden max-w-xs truncate md:table-cell">
+                    {record.consejo ?? "—"}
+                  </TableCell>
                   <TableCell className="hidden max-w-xs truncate md:table-cell">
                     {record.observaciones ?? "—"}
                   </TableCell>

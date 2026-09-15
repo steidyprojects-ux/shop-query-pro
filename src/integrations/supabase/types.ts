@@ -73,12 +73,14 @@ export type Database = {
           cedula: string
           cedula_asesor: string | null
           ciudad: string
+          consejo: string | null
           created_at: string
           created_by: string | null
           direccion: string | null
           estado: string
           id: string
           nodo: string | null
+          nombre_completo: string | null
           observaciones: string | null
           primer_apellido: string | null
           tipo_red: string | null
@@ -88,12 +90,14 @@ export type Database = {
           cedula: string
           cedula_asesor?: string | null
           ciudad: string
+          consejo?: string | null
           created_at?: string
           created_by?: string | null
           direccion?: string | null
           estado: string
           id?: string
           nodo?: string | null
+          nombre_completo?: string | null
           observaciones?: string | null
           primer_apellido?: string | null
           tipo_red?: string | null
@@ -103,12 +107,14 @@ export type Database = {
           cedula?: string
           cedula_asesor?: string | null
           ciudad?: string
+          consejo?: string | null
           created_at?: string
           created_by?: string | null
           direccion?: string | null
           estado?: string
           id?: string
           nodo?: string | null
+          nombre_completo?: string | null
           observaciones?: string | null
           primer_apellido?: string | null
           tipo_red?: string | null
