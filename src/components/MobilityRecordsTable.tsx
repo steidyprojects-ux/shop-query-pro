@@ -284,6 +284,15 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               </div>
             </div>
             <div className="space-y-2">
+              <Label htmlFor="consejo">Consejo</Label>
+              <Textarea
+                id="consejo"
+                value={form.consejo}
+                onChange={(e) => setForm({ ...form, consejo: e.target.value })}
+                rows={2}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="observaciones">Observaciones</Label>
               <Textarea
                 id="observaciones"
