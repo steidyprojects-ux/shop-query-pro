@@ -222,6 +222,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="nombre_completo">Nombre completo</Label>
+                <Input
+                  id="nombre_completo"
+                  value={form.nombre_completo}
+                  onChange={(e) => setForm({ ...form, nombre_completo: e.target.value })}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="estado">Estado</Label>
