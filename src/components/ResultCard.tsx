@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, AlertCircle, FileSearch } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, FileSearch, Lightbulb } from "lucide-react";
 
 interface ResultCardProps {
   resultado: {
@@ -9,10 +9,10 @@ interface ResultCardProps {
       id: string;
       cedula: string;
       primer_apellido: string | null;
+      nombre_completo: string | null;
       ciudad: string;
       estado: string;
       observaciones: string | null;
-      nombre_completo: string | null;
       consejo: string | null;
       nodo: string | null;
       tipo_red: string | null;
@@ -85,7 +85,7 @@ export function ResultCard({ resultado }: ResultCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Cédula
@@ -96,13 +96,9 @@ export function ResultCard({ resultado }: ResultCardProps) {
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Nombre completo
             </p>
-            <p className="text-lg font-semibold text-foreground">{record.nombre_completo ?? "—"}</p>
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Primer apellido
+            <p className="text-lg font-semibold text-foreground">
+              {record.nombre_completo || record.primer_apellido || "—"}
             </p>
-            <p className="text-lg font-semibold text-foreground">{record.primer_apellido ?? "—"}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -130,21 +126,26 @@ export function ResultCard({ resultado }: ResultCardProps) {
           ))}
         </div>
 
-
-
-        <div className={`flex items-start gap-3 rounded-lg border border-border/60 bg-muted/40 p-4 ${config.color}`}>
+        {/* Observación tal cual la reporta el portal Visor */}
+        <div className={`flex items-center gap-3 rounded-lg border border-border/60 bg-muted/40 p-4 ${config.color}`}>
           {config.icon}
-          <div className="min-w-0 flex-1">
+          <div>
             <p className="font-semibold">{config.label}</p>
-            {record.consejo ? (
-              <p className="text-sm text-muted-foreground">{record.consejo}</p>
-            ) : record.observaciones ? (
+            {record.observaciones ? (
               <p className="text-sm text-muted-foreground">{record.observaciones}</p>
             ) : (
               <p className="text-sm text-muted-foreground">Sin observaciones adicionales.</p>
             )}
           </div>
         </div>
+
+        {/* Consejo/recordatorio para el asesor, en su propio recuadro */}
+        {record.consejo && (
+          <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 p-4 text-primary">
+            <Lightbulb className="h-5 w-5 shrink-0" />
+            <p className="text-sm font-medium">{record.consejo}</p>
+          </div>
+        )}
 
         <p className="text-right text-xs text-muted-foreground">
           Registrado el {new Date(record.created_at).toLocaleDateString("es-CO")}
