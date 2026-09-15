@@ -11,11 +11,11 @@ const consultaSchema = z.object({
 const recordSchema = z.object({
   cedula: z.string().min(5).max(20).trim(),
   primer_apellido: z.string().min(2).max(50).trim(),
+  nombre_completo: z.string().max(150).optional(),
   ciudad: z.string().min(2).max(50).trim(),
   estado: z.enum(["aprobada", "rechazada", "con_deuda"]),
   observaciones: z.string().max(500).optional(),
-  nombre_completo: z.string().max(120).optional(),
-  consejo: z.string().max(1000).optional(),
+  consejo: z.string().max(300).optional(),
   nodo: z.string().max(100).optional(),
   tipo_red: z.string().max(100).optional(),
   direccion: z.string().max(200).optional(),
@@ -27,7 +27,7 @@ const idSchema = z.object({
 });
 
 const RECORD_COLS =
-  "id, cedula, primer_apellido, ciudad, estado, observaciones, nombre_completo, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at";
+  "id, cedula, primer_apellido, nombre_completo, ciudad, estado, observaciones, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at";
 
 // ============================================================
 // Llama al servicio de Playwright en el VPS que consulta en vivo
@@ -43,14 +43,15 @@ async function consultarVisorEnVivo(input: {
 }): Promise<
   | {
       ok: true;
-      textoCompleto: string;
+      observaciones: string;
+      nombreCompleto: string;
       estado: "aprobada" | "rechazada" | "con_deuda";
       consejo: string;
     }
   | { ok: false; error: string }
 > {
-  const url = process.env['VISOR_API_URL'];
-  const apiKey = process.env['SIAPP_API_KEY']; // misma clave compartida del servidor api-lovable
+  const url = process.env.VISOR_API_URL;
+  const apiKey = process.env.SIAPP_API_KEY; // misma clave compartida del servidor api-lovable
 
   if (!url || !apiKey) {
     return { ok: false, error: "Integración con el Visor no configurada." };
@@ -72,7 +73,8 @@ async function consultarVisorEnVivo(input: {
     const json = (await respuesta.json().catch(() => null)) as
       | {
           ok?: boolean;
-          textoCompleto?: string;
+          observaciones?: string;
+          nombreCompleto?: string;
           estado?: "aprobada" | "rechazada" | "con_deuda";
           consejo?: string;
           error?: string;
@@ -85,7 +87,8 @@ async function consultarVisorEnVivo(input: {
 
     return {
       ok: true,
-      textoCompleto: json.textoCompleto ?? "",
+      observaciones: json.observaciones ?? "",
+      nombreCompleto: json.nombreCompleto ?? "",
       estado: json.estado ?? "rechazada",
       consejo: json.consejo ?? "",
     };
@@ -112,17 +115,16 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
       throw new Error("No se pudo consultar el Visor en este momento: " + live.error);
     }
 
-    const observacionesFinal = [live.textoCompleto, live.consejo].filter(Boolean).join("\n\n");
-
     // Guardamos el resultado como historial, igual que antes hacía crearRegistro.
     const { data: registro, error } = await supabase
       .from("mobility_records")
       .insert({
         cedula: data.cedula,
         primer_apellido: data.primer_apellido,
+        nombre_completo: live.nombreCompleto || null,
         ciudad: data.ciudad,
         estado: live.estado,
-        observaciones: observacionesFinal || null,
+        observaciones: live.observaciones || null,
         consejo: live.consejo || null,
         created_by: userId,
       })
@@ -139,10 +141,10 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
           id: "",
           cedula: data.cedula,
           primer_apellido: data.primer_apellido,
+          nombre_completo: live.nombreCompleto || null,
           ciudad: data.ciudad,
           estado: live.estado,
-          observaciones: observacionesFinal || null,
-          nombre_completo: null,
+          observaciones: live.observaciones || null,
           consejo: live.consejo || null,
           nodo: null,
           tipo_red: null,
@@ -173,7 +175,7 @@ export const listarRegistros = createServerFn({ method: "GET" })
     const { data: records, error } = await supabase
       .from("mobility_records")
       .select(
-        "id, cedula, primer_apellido, ciudad, estado, observaciones, nombre_completo, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
+        "id, cedula, primer_apellido, nombre_completo, ciudad, estado, observaciones, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
       )
       .order("created_at", { ascending: false });
 
@@ -205,10 +207,10 @@ export const crearRegistro = createServerFn({ method: "POST" })
       .insert({
         cedula: data.cedula,
         primer_apellido: data.primer_apellido,
+        nombre_completo: data.nombre_completo ?? null,
         ciudad: data.ciudad,
         estado: data.estado,
         observaciones: data.observaciones ?? null,
-        nombre_completo: data.nombre_completo ?? null,
         consejo: data.consejo ?? null,
         nodo: data.nodo ?? null,
         tipo_red: data.tipo_red ?? null,
@@ -244,14 +246,14 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
       throw new Error("No tienes permisos para actualizar registros.");
     }
 
-    const { id, cedula, primer_apellido, ciudad, estado, observaciones, nombre_completo, consejo, nodo, tipo_red, direccion, cedula_asesor } = data;
+    const { id, cedula, primer_apellido, nombre_completo, ciudad, estado, observaciones, consejo, nodo, tipo_red, direccion, cedula_asesor } = data;
     const updates: Partial<{
       cedula: string;
       primer_apellido: string;
+      nombre_completo: string | null;
       ciudad: string;
       estado: "aprobada" | "rechazada" | "con_deuda";
       observaciones: string | null;
-      nombre_completo: string | null;
       consejo: string | null;
       nodo: string | null;
       tipo_red: string | null;
@@ -261,12 +263,12 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
 
     if (cedula !== undefined) updates.cedula = cedula;
     if (primer_apellido !== undefined) updates.primer_apellido = primer_apellido;
+    if (nombre_completo !== undefined) updates.nombre_completo = nombre_completo || null;
     if (ciudad !== undefined) updates.ciudad = ciudad;
     if (estado !== undefined) updates.estado = estado;
     if (observaciones !== undefined) {
       updates.observaciones = observaciones || null;
     }
-    if (nombre_completo !== undefined) updates.nombre_completo = nombre_completo || null;
     if (consejo !== undefined) updates.consejo = consejo || null;
     if (nodo !== undefined) updates.nodo = nodo || null;
     if (tipo_red !== undefined) updates.tipo_red = tipo_red || null;
@@ -278,7 +280,7 @@ export const actualizarRegistro = createServerFn({ method: "POST" })
       .update(updates)
       .eq("id", id)
       .select(
-        "id, cedula, primer_apellido, ciudad, estado, observaciones, nombre_completo, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
+        "id, cedula, primer_apellido, nombre_completo, ciudad, estado, observaciones, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
       )
       .single();
 
