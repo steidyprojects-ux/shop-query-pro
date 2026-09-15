@@ -160,6 +160,8 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
       ciudad: record.ciudad,
       estado: record.estado,
       observaciones: record.observaciones ?? "",
+      nombre_completo: record.nombre_completo ?? "",
+      consejo: record.consejo ?? "",
       nodo: record.nodo ?? "",
       tipo_red: record.tipo_red ?? "",
       direccion: record.direccion ?? "",
