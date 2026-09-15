@@ -14,6 +14,8 @@ const recordSchema = z.object({
   ciudad: z.string().min(2).max(50).trim(),
   estado: z.enum(["aprobada", "rechazada", "con_deuda"]),
   observaciones: z.string().max(500).optional(),
+  nombre_completo: z.string().max(120).optional(),
+  consejo: z.string().max(1000).optional(),
   nodo: z.string().max(100).optional(),
   tipo_red: z.string().max(100).optional(),
   direccion: z.string().max(200).optional(),
@@ -25,7 +27,7 @@ const idSchema = z.object({
 });
 
 const RECORD_COLS =
-  "id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at";
+  "id, cedula, primer_apellido, ciudad, estado, observaciones, nombre_completo, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at";
 
 // ============================================================
 // Llama al servicio de Playwright en el VPS que consulta en vivo
