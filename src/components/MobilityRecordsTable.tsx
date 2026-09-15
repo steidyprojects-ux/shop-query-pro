@@ -320,6 +320,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableHeader>
             <TableRow>
               <TableHead>Cédula</TableHead>
+              <TableHead className="hidden md:table-cell">Nombre completo</TableHead>
               <TableHead className="hidden md:table-cell">Primer apellido</TableHead>
               <TableHead>Ciudad</TableHead>
               <TableHead>Estado</TableHead>
@@ -327,6 +328,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               <TableHead className="hidden lg:table-cell">Tipo de red</TableHead>
               <TableHead className="hidden xl:table-cell">Dirección</TableHead>
               <TableHead className="hidden xl:table-cell">Cédula asesor</TableHead>
+              <TableHead className="hidden md:table-cell">Consejo</TableHead>
               <TableHead className="hidden md:table-cell">Observaciones</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
