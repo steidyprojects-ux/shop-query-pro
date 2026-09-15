@@ -123,6 +123,7 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
         ciudad: data.ciudad,
         estado: live.estado,
         observaciones: observacionesFinal || null,
+        consejo: live.consejo || null,
         created_by: userId,
       })
       .select(RECORD_COLS)
@@ -141,6 +142,8 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
           ciudad: data.ciudad,
           estado: live.estado,
           observaciones: observacionesFinal || null,
+          nombre_completo: null,
+          consejo: live.consejo || null,
           nodo: null,
           tipo_red: null,
           direccion: null,
