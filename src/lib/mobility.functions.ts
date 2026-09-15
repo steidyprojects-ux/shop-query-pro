@@ -47,8 +47,8 @@ async function consultarVisorEnVivo(input: {
     }
   | { ok: false; error: string }
 > {
-  const url = process.env.VISOR_API_URL;
-  const apiKey = process.env.SIAPP_API_KEY; // misma clave compartida del servidor api-lovable
+  const url = process.env['VISOR_API_URL'];
+  const apiKey = process.env['SIAPP_API_KEY']; // misma clave compartida del servidor api-lovable
 
   if (!url || !apiKey) {
     return { ok: false, error: "Integración con el Visor no configurada." };
