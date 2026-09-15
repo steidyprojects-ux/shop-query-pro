@@ -108,24 +108,6 @@ export function ResultCard({ resultado }: ResultCardProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {[
-            { label: "Nodo", value: record.nodo },
-            { label: "Tipo de red", value: record.tipo_red },
-            { label: "Dirección", value: record.direccion },
-            { label: "Cédula asesor de digitación", value: record.cedula_asesor },
-          ].map((item) => (
-            <div key={item.label}>
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {item.label}
-              </p>
-              <p className="text-base font-medium text-foreground">
-                {item.value || "—"}
-              </p>
-            </div>
-          ))}
-        </div>
-
         {/* Observación tal cual la reporta el portal Visor */}
         <div className={`flex items-center gap-3 rounded-lg border border-border/60 bg-muted/40 p-4 ${config.color}`}>
           {config.icon}
