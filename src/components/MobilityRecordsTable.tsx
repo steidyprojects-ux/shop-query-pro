@@ -336,14 +336,14 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={10} className="py-8 text-center">
+                <TableCell colSpan={12} className="py-8 text-center">
                   <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
                 </TableCell>
               </TableRow>
             ) : records.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={10}
+                  colSpan={12}
                   className="py-8 text-center text-muted-foreground"
                 >
                   No hay registros aún.
