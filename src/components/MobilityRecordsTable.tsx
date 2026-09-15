@@ -353,6 +353,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
               records.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell className="font-medium">{record.cedula}</TableCell>
+                  <TableCell className="hidden md:table-cell">{record.nombre_completo ?? "—"}</TableCell>
                   <TableCell className="hidden md:table-cell">{record.primer_apellido ?? "—"}</TableCell>
                   <TableCell>{record.ciudad}</TableCell>
                   <TableCell>
@@ -365,6 +366,9 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
                   <TableCell className="hidden lg:table-cell">{record.tipo_red ?? "—"}</TableCell>
                   <TableCell className="hidden max-w-xs truncate xl:table-cell">{record.direccion ?? "—"}</TableCell>
                   <TableCell className="hidden xl:table-cell">{record.cedula_asesor ?? "—"}</TableCell>
+                  <TableCell className="hidden max-w-xs truncate md:table-cell">
+                    {record.consejo ?? "—"}
+                  </TableCell>
                   <TableCell className="hidden max-w-xs truncate md:table-cell">
                     {record.observaciones ?? "—"}
                   </TableCell>
