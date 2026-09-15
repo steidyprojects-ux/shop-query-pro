@@ -85,6 +85,8 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
     ciudad: "",
     estado: "aprobada",
     observaciones: "",
+    nombre_completo: "",
+    consejo: "",
     nodo: "",
     tipo_red: "",
     direccion: "",
@@ -92,7 +94,7 @@ export function MobilityRecordsTable({ records, isLoading }: MobilityRecordsTabl
   });
 
   const resetForm = () => {
-    setForm({ cedula: "", primer_apellido: "", ciudad: "", estado: "aprobada", observaciones: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
+    setForm({ cedula: "", primer_apellido: "", ciudad: "", estado: "aprobada", observaciones: "", nombre_completo: "", consejo: "", nodo: "", tipo_red: "", direccion: "", cedula_asesor: "" });
     setEditing(null);
   };
 
