@@ -27,24 +27,24 @@ const idSchema = z.object({
 const RECORD_COLS =
   "id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at";
 
-/** Convierte el texto de "Observaciones" del Visor en el enum estado de nuestra tabla. */
-function estadoDesdeObservaciones(observaciones: string): "aprobada" | "rechazada" | "con_deuda" {
-  if (/RECHAZADO/i.test(observaciones)) return "rechazada";
-  if (/(DEUDA|MORA|CARTERA)/i.test(observaciones)) return "con_deuda";
-  return "aprobada";
-}
-
 // ============================================================
 // Llama al servicio de Playwright en el VPS que consulta en vivo
 // el portal Visor Movilidad de Claro (mismo servidor que SIAPP,
-// misma API key, ruta distinta).
+// misma API key, ruta distinta). El servidor ya devuelve el
+// estado (aprobada/rechazada/con_deuda) y el consejo para el
+// asesor, según las reglas de negocio.
 // ============================================================
 async function consultarVisorEnVivo(input: {
   cedula: string;
   apellido: string;
   ciudad: string;
 }): Promise<
-  | { ok: true; texto: string; observaciones: string; necesitaEscalar: boolean }
+  | {
+      ok: true;
+      textoCompleto: string;
+      estado: "aprobada" | "rechazada" | "con_deuda";
+      consejo: string;
+    }
   | { ok: false; error: string }
 > {
   const url = process.env.VISOR_API_URL;
@@ -62,12 +62,19 @@ async function consultarVisorEnVivo(input: {
         "x-api-key": apiKey,
       },
       body: JSON.stringify(input),
-      // El login + formulario + modal en el portal real puede tardar hasta ~1 minuto.
-      signal: AbortSignal.timeout(90000),
+      // El login + formulario + modal en el portal real puede tardar hasta ~1.5 minutos,
+      // y con varias consultas simultáneas puede tardar un poco más por la cola interna.
+      signal: AbortSignal.timeout(150000),
     });
 
     const json = (await respuesta.json().catch(() => null)) as
-      | { ok?: boolean; texto?: string; observaciones?: string; necesitaEscalar?: boolean; error?: string }
+      | {
+          ok?: boolean;
+          textoCompleto?: string;
+          estado?: "aprobada" | "rechazada" | "con_deuda";
+          consejo?: string;
+          error?: string;
+        }
       | null;
 
     if (!respuesta.ok || !json?.ok) {
@@ -76,9 +83,9 @@ async function consultarVisorEnVivo(input: {
 
     return {
       ok: true,
-      texto: json.texto ?? "",
-      observaciones: json.observaciones ?? "",
-      necesitaEscalar: json.necesitaEscalar ?? false,
+      textoCompleto: json.textoCompleto ?? "",
+      estado: json.estado ?? "rechazada",
+      consejo: json.consejo ?? "",
     };
   } catch (e) {
     console.error("Error llamando al servicio del Visor:", e);
@@ -103,7 +110,7 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
       throw new Error("No se pudo consultar el Visor en este momento: " + live.error);
     }
 
-    const estado = estadoDesdeObservaciones(live.observaciones);
+    const observacionesFinal = [live.textoCompleto, live.consejo].filter(Boolean).join("\n\n");
 
     // Guardamos el resultado como historial, igual que antes hacía crearRegistro.
     const { data: registro, error } = await supabase
@@ -112,8 +119,8 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
         cedula: data.cedula,
         primer_apellido: data.primer_apellido,
         ciudad: data.ciudad,
-        estado,
-        observaciones: live.observaciones || live.texto || null,
+        estado: live.estado,
+        observaciones: observacionesFinal || null,
         created_by: userId,
       })
       .select(RECORD_COLS)
@@ -130,19 +137,18 @@ export const consultarMovilidad = createServerFn({ method: "POST" })
           cedula: data.cedula,
           primer_apellido: data.primer_apellido,
           ciudad: data.ciudad,
-          estado,
-          observaciones: live.observaciones || live.texto || null,
+          estado: live.estado,
+          observaciones: observacionesFinal || null,
           nodo: null,
           tipo_red: null,
           direccion: null,
           cedula_asesor: null,
           created_at: new Date().toISOString(),
         },
-        necesitaEscalar: live.necesitaEscalar,
       };
     }
 
-    return { encontrado: true, resultado: registro, necesitaEscalar: live.necesitaEscalar };
+    return { encontrado: true, resultado: registro };
   });
 
 export const listarRegistros = createServerFn({ method: "GET" })
