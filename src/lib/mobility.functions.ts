@@ -208,6 +208,8 @@ export const crearRegistro = createServerFn({ method: "POST" })
         ciudad: data.ciudad,
         estado: data.estado,
         observaciones: data.observaciones ?? null,
+        nombre_completo: data.nombre_completo ?? null,
+        consejo: data.consejo ?? null,
         nodo: data.nodo ?? null,
         tipo_red: data.tipo_red ?? null,
         direccion: data.direccion ?? null,
