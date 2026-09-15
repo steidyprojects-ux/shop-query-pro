@@ -173,7 +173,7 @@ export const listarRegistros = createServerFn({ method: "GET" })
     const { data: records, error } = await supabase
       .from("mobility_records")
       .select(
-        "id, cedula, primer_apellido, ciudad, estado, observaciones, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
+        "id, cedula, primer_apellido, ciudad, estado, observaciones, nombre_completo, consejo, nodo, tipo_red, direccion, cedula_asesor, created_at, updated_at"
       )
       .order("created_at", { ascending: false });
 
