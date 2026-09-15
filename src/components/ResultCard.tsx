@@ -85,12 +85,18 @@ export function ResultCard({ resultado }: ResultCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Cédula
             </p>
             <p className="text-lg font-semibold text-foreground">{record.cedula}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Nombre completo
+            </p>
+            <p className="text-lg font-semibold text-foreground">{record.nombre_completo ?? "—"}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
